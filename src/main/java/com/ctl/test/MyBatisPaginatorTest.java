@@ -1,6 +1,5 @@
 package com.ctl.test;
 
-import com.ctl.test.mapper.PersonMapper;
 import com.ctl.test.po.Person;
 import com.ctl.test.po.PersonExample;
 import com.github.miemiedev.mybatis.paginator.domain.PageBounds;
