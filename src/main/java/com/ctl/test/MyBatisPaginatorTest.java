@@ -1,10 +1,13 @@
 package com.ctl.test;
 
+import com.ctl.test.mapper.PersonMapper;
 import com.ctl.test.po.Person;
 import com.ctl.test.po.PersonExample;
 import com.github.miemiedev.mybatis.paginator.domain.PageBounds;
 import com.github.miemiedev.mybatis.paginator.domain.PageList;
 import com.github.miemiedev.mybatis.paginator.domain.Paginator;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -52,5 +55,6 @@ public class MyBatisPaginatorTest {
         logger.info("totalPages:"+paginator.getTotalPages());
         logger.info("totalCount:"+paginator.getTotalCount());
         logger.info("page:"+paginator.getPage());
+        logger.info(JSONArray.fromObject(peopleList).toString());
     }
 }
