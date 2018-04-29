@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:email xmlns:tns="http://www.example.org/email" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/email email.xsd ">
+  <tns:from>赵敏</tns:from>
+  <tns:to>张无忌</tns:to>
+  <tns:subject>say hello</tns:subject>
+  <tns:body>周五下午开会!</tns:body>
+  <tns:student>
+      <tns:id>i</tns:id>	
+      <tns:name>name</tns:name>
+  </tns:student>
+</tns:email>

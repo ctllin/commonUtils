@@ -1,0 +1,1650 @@
+查看进程有多少子线程
+方式一、
+	在ps命令中，“-T”选项可以开启线程查看。下面的命令列出了由进程号为<pid>的进程创建的所有线程。 
+	ps -T -p  <pid>   #ps -T -p   6907 查看进程6907下面的所有子进程
+方式二、
+	top命令可以实时显示各个线程情况。要在top输出中开启线程查看，请调用top命令的“-H”选项，该选项会列出所有Linux线程。在top运行时，你也可以通过按“H”键将线程查看模式切换为开或关。
+	top -H -p <pid> # top -H -p 6907
+方式三、
+	dnf install htop
+	一个对用户更加友好的方式是，通过htop查看单个进程的线程，它是一个基于ncurses的交互进程查看器。该程序允许你在树状视图中监控单个独立线程。
+	要在htop中启用线程查看，请开启htop，然后按<F2>来进入htop的设置菜单。选择“设置”栏下面的“显示选项”，然后开启“树状视图”和“显示自定义线程名”选项。按<F10>退出设置。
+方法四、
+	: /proc
+	proc 伪文件系统，它驻留在 /proc 目录，这是最简单的方法来查看任何活动进程的线程数。 /proc 目录以可读文本文件形式输出，提供现有进程和系统硬件相关的信息如 CPU、中断、内存、磁盘等等.
+	1.$ cat/proc/<pid>/status
+	上面的命令将显示进程 <pid> 的详细信息，包括过程状态（例如, sleeping, running)，父进程 PID，UID，GID，使用的文件描述符的数量，以及上下文切换的数量。输出也包括进程创建的总线程数如下所示。
+	1.Threads:<N>
+	例如，检查 PID 20571进程的线程数：
+	1.$ cat/proc/20571/status
+方式五、
+	可以在 /proc//task 中简单的统计子目录的数量，如下所示。
+	1.$ ls/proc/<pid>/task |wc
+	这是因为，对于一个进程中创建的每个线程，在 /proc/<pid>/task 中会创建一个相应的目录，命名为其线程 ID。由此在 /proc/<pid>/task 中目录的总数表示在进程中线程的数目。
+方法六:
+	ps
+	如果你是功能强大的 ps 命令的忠实用户，这个命令也可以告诉你一个进程（用“H”选项）的线程数。下面的命令将输出进程的线程数。“h”选项需要放在前面。
+	1.$ ps hH p <pid>|wc-l
+
+Linux中启动或禁止用户使用SSH登录
+#vim /etc/ssh/sshd_config
+DenyUsers    username #多个用户用空格隔开例如 DenyUsers ftpuser nginxuser mysqluser
+修改完配置文件，必须重新启动SSH服务才能生效
+#/etc/init.d/sshd restart 或者systemctl restart sshd.service 需要使用crt重新打开窗口才能验证
+修改此行内容，用以禁止 Root 用户使用SSH登陆
+#PermitRootLogin yes  把#号去掉，yes修改为no即可
+
+关闭SELinux的方法：
+修改/etc/selinux/config文件中的SELINUX="" 为 disabled ，然后重启。
+如果不想重启系统，使用命令setenforce 0  
+注：
+setenforce 1 设置SELinux 成为enforcing模式
+setenforce 0 设置SELinux 成为permissive模式
+
+
+方式一（等同方式二）
+curl -XPOST -H "Content-Type: application/json" 'http://192.168.42.29:9200/_count?pretty' -d '{"query": {"match_all": {}}}'
+方式二
+curl -H "Content-Type: application/json" -X POST  --data  '{"query": {"match_all": {}}}' 'http://192.168.42.29:9200/_count?pretty' 
+curl -H "Content-Type: application/json" -X POST  --data  '{"request":{"head":{"authCode":"0003","appId":"119","sign":"F9604CA615972D15D8C7ED38CC01D546","appKey":"0002","type":"daily.sales"},"body":{"begintime":"2018-03-20","currow":0,"endtime":"2018-03-20","paytype":"1,2,3","rows":1}}}
+' 'http://api.xilehang.cn/AirshopApi/common/operate/v' 
+
+secureCRT快捷键
+复制:[ctrl] + [shift] + c
+　　粘贴:[ctrl] + [shift] + v
+　　全屏:[alt] + Enter
+　　菜单View的快捷键：[alt] + v
+　　Ctrl + A   -- 光标移至行首
+　　Ctrl + E   -- 光标移至行末
+　　Ctrl + k   -- 删除当前光标至行末的字符
+　　Ctrl + W  -- 删除当前光标至行首的字符
+　　Alt + B    -- 打开新的连接
+　　Alt + F + N  -- 克隆会话
+0、在secureCRT里切换不同的窗口：ctrl+tab。
+
+将字符串"hello world"写入文件file.txt中  	$ echo "hello world" > file.txt
+将字符串"hello world"追加写入文件file.txt中   	$ echo "hello world" >> file.txt
+
+linux 下查看文件个数及大小
+ls -l |grep "^-"|wc -l或find ./company -type f | wc -l
+查看某文件夹下文件的个数，包括子文件夹里的。
+ls -lR|grep "^-"|wc -l
+查看某文件夹下文件夹的个数，包括子文件夹里的。
+ls -lR|grep "^d"|wc -l
+ls显示指定个数的文件
+楼上的说  前N行
+ls | head -N
+后N行
+ls | tail -N
+从第N行到第M行
+ls | head -M | tail -$(M-N的值) 
+#按时间排序查看第二个到第四个
+ls -tl warsback/|head -4|tail -3
+linux ls 按文件大小排序
+ls -Sl
+
+
+
+Linux查看文件夹大小
+du -sh 查看当前文件夹大小
+du -sh * | sort -n 统计当前文件夹(目录)大小，并按文件大小排序
+du -sk filename 查看指定文件大小
+
+Centos7关闭图形界面
+查看默认的target，执行：
+systemctl get-default
+开机以命令模式启动，执行：
+systemctl set-default multi-user.target
+Removed /etc/systemd/system/default.target.
+Created symlink /etc/systemd/system/default.target → /usr/lib/systemd/system/multi-user.target.
+开机以图形界面启动，执行：
+systemctl set-default graphical.target
+Removed /etc/systemd/system/default.target.
+Created symlink /etc/systemd/system/default.target → /usr/lib/systemd/system/graphical.target.
+
+
+shutdown –h 20:25 系统会在今天20:25关机
+shutdown –h +10 十分钟后关机
+shutdown –r now 系统立马重启
+shutdown –r +10 系统十分钟后重启
+reboot   也表示重启！
+
+shell脚本
+printf "%-10s %-8s %-4s\n" 姓名 性别 体重kg  
+printf "%-10s %-8s %-4.2f\n" 郭靖 男 66.1234 
+
+检查已安装版本
+#检查是否安装了低版本的SVN
+[root@localhost /]# rpm -qa subversion
+执行删除python-urlgrabber-3.9.1-9.el6.noarch 不检查依赖关系
+[root@ctl23 yumdir]# rpm -e python-urlgrabber-3.9.1-9.el6.noarch --nodeps
+
+安装SVN
+[root@localhost modules]# yum install subversion
+
+Linux开机自启动的几种方式：
+第一种方式：在/etc/rc.local文件中加入启动命令
+这种方式适合linux用户手动配置自启动程序。
+
+route  -n 查看默认网关route del default删除默认网关  
+route add default gw 10.0.0.1 dev eth8   #添加默认网关这样就可以上网了
+route del -host 10.0.0.106 dev eth8  #删除路由
+route del -host 119.61.68.136 dev em1
+route del -net 119.61.68.136   netmask 255.255.255.248
+route add -net 119.61.68.136 netmask 255.255.255.248 dev em1
+#查看80端口占用进程 
+netstat -anop|grep 80
+netstat -tln
+Linux运行：查看端口情况
+netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}' 
+根据端口号查看进程
+netstat -lnp   |grep 9088
+--查看80端口是否占用
+netstat -ano|grep 80
+netstat -ano|findstr "80"
+netstat -anp查看端口占用
+netstat -apn | grep 80
+
+[转] Linux shell判断文件和文件夹是否存在
+shell判断文件,目录是否存在或者具有权限
+复制代码
+#!/bin/sh  
+myPath="/var/log/httpd/"  
+myFile="/var /log/httpd/access.log"  
+#这里的-x 参数判断$myPath是否存在并且是否具有可执行权限  
+if [ ! -x "$myPath"]; then  
+　　mkdir "$myPath"  
+fi  
+#这里的-d 参数判断$myPath是否存在  
+if [ ! -d "$myPath"]; then  
+　　mkdir "$myPath"  
+fi   
+#这里的-f参数判断$myFile是否存在  
+if [ ! -f "$myFile" ]; then  
+　　touch "$myFile"  
+fi   
+#其他参数还有-n,-n是判断一个变量是否是否有值  
+if [ ! -n "$myVar" ]; then  
+　　echo "$myVar is empty"  
+　　exit 0  
+fi    
+#两个变量判断是否相等  
+if [ "$var1" = "$var2" ]; then  
+　　echo '$var1 eq $var2'  
+else  
+　　echo '$var1 not eq $var2'  
+fi  
+
+函数参数
+funWithParam(){
+    echo "第一个参数为 $1 !"
+    echo "第二个参数为 $2 !"
+    echo "第十个参数为 $10 !"
+    echo "第十个参数为 ${10} !"
+    echo "第十一个参数为 ${11} !"
+    echo "参数总数有 $# 个!"
+    echo "作为一个字符串输出所有参数 $* !"
+}
+funWithParam 1 2 3 4 5 6 7 8 9 34 73
+
+Shell 基本运算符
+#!/bin/bash
+val=`expr 2 + 2`  #expr 是一款表达式计算工具，使用它能完成表达式的求值操作。
+echo "两数之和为 : $val"
+两数之和为 : 4
+
+Shell 传递参数
+test.sh 内容如下
+echo "Shell 传递参数实例！";
+echo "执行的文件名：$0";
+echo "传递到脚本的参数个数$#"
+echo "传递到脚本的参数在一行显示$*"
+echo "脚本运行的当前进程ID号$$"
+echo "第一个参数为：$1";
+echo "第二个参数为：$2";
+echo "第三个参数为：$3";
+ chmod +x test.sh 
+[root@localhost tomcat8]# sh test.sh 1 2 3
+Shell 传递参数实例！
+执行的文件名：test.sh
+传递到脚本的参数个数3
+传递到脚本的参数在一行显示1 2 3
+脚本运行的当前进程ID号20084
+第一个参数为：1
+第二个参数为：2
+第三个参数为：3
+
+
+Linux 的字符串截取很有用。有八种方法。
+假设有变量 var=http://www.aaa.com/123.htm
+1. # 号截取，删除左边字符，保留右边字符。
+echo ${var#*//}
+其中 var 是变量名，# 号是运算符，*// 表示从左边开始删除第一个 // 号及左边的所有字符
+即删除 http://
+结果是 ：www.aaa.com/123.htm
+2. ## 号截取，删除左边字符，保留右边字符。
+echo ${var##*/}
+##*/ 表示从左边开始删除最后（最右边）一个 / 号及左边的所有字符
+即删除 http://www.aaa.com/
+结果是 123.htm
+3. %号截取，删除右边字符，保留左边字符
+echo ${var%/*}
+%/* 表示从右边开始，删除第一个 / 号及右边的字符
+结果是：http://www.aaa.com
+4. %% 号截取，删除右边字符，保留左边字符
+echo ${var%%/*}
+%%/* 表示从右边开始，删除最后（最左边）一个 / 号及右边的字符
+结果是：http:
+5. 从左边第几个字符开始，及字符的个数
+echo ${var:0:5}
+其中的 0 表示左边第一个字符开始，5 表示字符的总个数。
+结果是：http:
+6. 从左边第几个字符开始，一直到结束。
+echo ${var:7}
+其中的 7 表示左边第8个字符开始，一直到结束。
+结果是 ：www.aaa.com/123.htm
+7. 从右边第几个字符开始，及字符的个数
+echo ${var:0-7:3}
+其中的 0-7 表示右边算起第七个字符开始，3 表示字符的个数。
+结果是：123
+8. 从右边第几个字符开始，一直到结束。
+echo ${var:0-7}
+表示从右边第七个字符开始，一直到结束。
+结果是：123.htm
+求两个Linux文本文件的交集、差集、并集
+一、交集
+sort a.txt b.txt | uniq -d
+二、并集
+sort a.txt b.txt | uniq
+三、差集
+a.txt-b.txt:
+sort a.txt b.txt b.txt | uniq -u
+b.txt - a.txt:
+sort b.txt a.txt a.txt | uniq -u
+用lsusb -v可以打印信息的USB文本信息，然后再去解析文本即可。
+
+
+find 2017-10-1*  -type f -name '*.txt'|xargs grep -n --color=auto '9F9DE8C7C1B20171004123944'
+find /mnt/datadir/ftpclient/2017-10-1*  -name '*portal*'
+
+cat access.log |grep '18/Jul/2017' > /home/tomcat/18.log
+根据条件导出日志到另一个文件
+四种解决”Argument list too long”参数列表过长的办法
+在linux中删除大量文件时，直接用rm会出现：-bash: /bin/rm: 参数列表过长，的错误。
+这时可以用find命令来结合使用。
+1、rm * -rf 改为:
+find . -name "*" | xargs rm -rf '*' 就行了。
+2、rm test* -rf 改为:
+find . -name "test*" | xargs rm -rf "test*"
+find . -name "*bak.jpg" | xargs rm -rf "*bak.jpg"
+mv时报参数列表过长，
+for i in *.m;do mv $i ${i%.m};done
+于是求助于google，探索过程就省略了，直接说解决方法吧：
+ls dir1 | xargs -t -I {} mv {} dir2/{}
+这里的一对大括号是原文给的例子里用的，后来看了参数的用法，其实那对大括号是可以用任意字符串替换的，比如：
+ls dir1 | xargs -t -I asdf mv asdf dir2/asdf
+效果和大括号那一版是完全一样的，就是看起来有点儿不严肃。
+需要说明的是，上面xargs的第二个参数，是大写的i，读作”爱“的那个字母，不是小写的L。至于参数的含义嘛，我忘了。
+文件夹下文件数量  
+ls | wc -l
+ Linux下 报错“命令参数列表过长”，在用mv命令一次移动3万多个文件时失败了，原始命令类似这样：”mv $(ls dir1) dir2“。错误提示的中心思想是：”你这参数也太TM多了吧“。
+按照LZ想法大概可以这么做：find /dir1/ -maxdepth 1 | xargs -i mv {} /dir2/
+如果参数过长，使用tar比较简单
+tar -C /dir1/ -cf - . | tar -xf - -C /dir2/
+　　于是求助于google，探索过程就省略了，直接说解决方法吧：
+　　ls dir1 | xargs -t -I {} mv {} dir2/{}
+　　这里的一对大括号是原文给的例子里用的，后来看了参数的用法，其实那对大括号是可以用任意字符串替换的，比如：
+　　ls dir1 | xargs -t -I asdf mv asdf dir2/asdf
+　　效果和大括号那一版是完全一样的，就是看起来有点儿不严肃。
+　　需要说明的是，上面xargs的第二个参数，是大写的i，读作”爱“的那个字母，不是小写的L。至于参数的含义嘛，我忘了
+
+另外4种方法
+作为一个linux用户/系统管理员, 有些时候你会遇到以下错误提示:
+ 
+[user@localhost foo]$ mv * ../foo2
+bash: /bin/mv: Argument list too long
+
+“Argument list too long”参数列表过长错误经常发生在用户在一行简单命令中提供了过多的参数而导致,经常在ls *, cp *, rm * 等中出现。
+根据问题的原因以下提供了四种方法，可以根据自己的情况酌情选用
+方法1 : 将文件群手动划分为比较小的组合
+e.g 1:
+ 
+[user@localhost foo]$ mv [a-l]* ../foo2
+[user@localhost foo]$ mv [m-z]* ../foo2
+
+这是最基本的方法，只是简单的使参数数量符合要求，这种方法应用范围有限，只适用于文件列表中的名字分布比较均匀，另外这也是个初级用户可以考虑的解决方案，不过需要很多重复命令和对文件名分布的观察与猜测。
+ 
+方法2 : 使用find命令
+e.g 2:
+ 
+[user@localhost foo]$ find $foo -type f -name '*' -exec mv {}$foo2/. \;
+方法2通过find命令，将文件清单输出到mv命令，使其一次处理一个，这样就完全避免了过量参数的存在，另外通过不同的参数，可以指定除了名称以外的时间戳，权限，以及inode等匹配模式。
+方法2的缺点在于比较耗费时间。
+ 
+方法3 : 创建shell函数
+e.g 3.1:
+ 
+function huge_mv ()
+{whileread line1; do
+mv foo/$line1 ../foo2
+done
+}
+ls -1 foo/ | huge_mv
+写一个shell函数并不涉及到某种程度的复杂性， 这种方法比方法1和方法2相比更加灵活。
+下面我们来扩展一下例3.1 :
+e.g 3.2:
+ 
+function huge_mv ()
+{whileread line1; do
+md5sum foo/$line1 >> ~/md5sums
+ls -l foo/$line1 >> ~/backup_list
+mv foo/$line1 ../foo2
+done
+}
+ls -1 foo/ | huge_mv
+相比例3.1，例3.2生成了文件的md校验散列文件和名字备份，符合给自己留条后路的哲学。
+另外可以根据自己的需要无限制的扩展功能。
+ 
+方法4 : 终极解决方案，重新编译内核
+首先使用这个方案之前要谨慎，因为涉及到修改内核源代码，在生产环境中还是要斟酌一下并做好测试。
+另外，这个方法是从根本上解决的，一劳永逸的 
+这也是开放源码的好处之一 
+首先在内核源码中找到 include/linux/binfmts.h文件 ，搜索到以下字段:
+/*
+* MAX_ARG_PAGES defines the number of pages allocated for arguments
+* and envelope for the new program. 32 should suffice, this gives
+* a maximum env+arg of 128kB w/4KB pages!
+*/
+#define MAX_ARG_PAGES 32
+修改 MAX_ARG_PAGES数值为 64 或者更高即可完善的解决参数受限问题。
+然后 重新编译并启用新内核即可。
+
+
+tar打包
+# tar -xvf  xx.tar					解压
+# tar -cvf /usr/local/auto_bak/test.tar /usr/local/test 仅打包，不压缩 
+# tar -zcvf /usr/local/auto_bak/test.tar.gz /usr/local/test 打包后，以gzip压缩 在参数f后面的压缩文件名是自己取的，习惯上用tar来做，如果加z参数，则以tar.gz 或tgz来代表gzip压缩过的tar file文件
+# tar -cf all.tar *.jpg 	这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。
+# tar -rf all.tar *.gif   这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。
+# tar -uf all.tar logo.gif  这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。
+# tar -tf all.tar  这条命令是列出all.tar包中所有文件，-t是列出文件的意思
+# tar -xf all.tar  这条命令是解出all.tar包中所有文件，-x是解开的意思
+压缩
+tar –cvf jpg.tar *.jpg //将目录里所有jpg文件打包成tar.jpg
+tar –czf jpg.tar.gz *.jpg   //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一  个gzip压缩过的包，命名为jpg.tar.gz
+tar –cjf jpg.tar.bz2 *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2
+tar –cZf jpg.tar.Z *.jpg   //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z
+下载并安装rar软件 wget http://www.rarlab.com/rar/rarlinux-3.8.0.tar.gz
+cd rarlinux-3.8.0 然后执行make && make install
+将/etc 目录压缩为etc.rar 命令为： rar a etc.rar /etc
+将etc.rar 解压 命令为：
+rar x etc.rar 
+unrar -e etc.tar
+rar a jpg.rar *.jpg //rar格式的压缩，需要先下载rar for linux
+zip jpg.zip *.jpg //zip格式的压缩，需要先下载zip for linux
+解压
+tar –xvf file.tar //解压 tar包
+tar -xzvf file.tar.gz //解压tar.gz
+tar -xjvf file.tar.bz2   //解压 tar.bz2
+tar –xZvf file.tar.Z   //解压tar.Z
+unrar e file.rar //解压rar
+unzip file.zip //解压zip
+总结
+  (1)、*.tar 用 tar –xvf 解压
+  (2)、*.gz 用 gzip -d或者gunzip 解压
+  (3)、*.tar.gz和*.tgz 用 tar –xzf 解压
+  (4)、*.bz2 用 bzip2 -d或者用bunzip2 解压
+  (5)、*.tar.bz2用tar –xjf 解压
+  (6)、*.Z 用 uncompress 解压
+  (7)、*.tar.Z 用tar –xZf 解压
+  (8)、*.rar 用 unrar e解压
+  (9)、*.zip 用 unzip 解压
+Linux压缩保留源文件的方法： 
+gzip –c filename > filename.gz 
+Linux解压缩保留源文件的方法： 
+gunzip –c filename.gz > filename 
+gunzip的用法
+  1.作用 
+gunzip命令作用是解压文件，使用权限是所有用户。 
+2.格式 
+gunzip [-acfhlLnNqrtvV][-s ][文件...] 
+或者gunzip [-acfhlLnNqrtvV][-s ][目录] 
+3.主要参数 
+-a或--ascii：使用ASCII文字模式。 
+-c或--stdout或--to-stdout：把解压后的文件输出到标准输出设备。 
+-f或-force：强行解开压缩文件，不理会文件名称或硬连接是否存在，以及该文件是否为符号连接。 
+-h或--help：在线帮助。 
+-l或--list：列出压缩文件的相关信息。 
+-L或--license：显示版本与版权信息。 
+-n或--no-name：解压缩时，若压缩文件内含有原来的文件名称及时间戳记，则将其忽略不予处理。 
+-N或--name：解压缩时，若压缩文件内含有原来的文件名称及时间戳记，则将其回存到解开的文件上。 
+-q或--quiet：不显示警告信息。 
+-r或--recursive：递归处理，将指定目录下的所有文件及子目录一并处理。 
+-S或--suffix：更改压缩字尾字符串。 
+-t或--test：测试压缩文件是否正确无误。 
+-v或--verbose：显示指令执行过程。 
+-V或--version：显示版本信息。 
+tar -cvf webapps.apk.tar --exclude=apk/ROOT/upload  apk/   tar打包排除文件夹upload,upload后面不能有/
+正确写法：
+tar -zcvf tomcat.tar.gz --exclude=tomcat/logs --exclude=tomcat/libs tomcat
+tar -zcvf apache-tomcat-8.5.20_103.235.230.213_20081.tar.gz --exclude=apache-tomcat-8.5.20/work --exclude=apache-tomcat-8.5.20/webapps/apiairbank  --exclude=apache-tomcat-8.5.20/webapps/airshop --exclude=apache-tomcat-8.5.20/webapps/airbanksso  --exclude=apache-tomcat-8.5.20/logs  --exclude=apache-tomcat-8.5.20/warsback apache-tomcat-8.5.20
+tar解压指定文件
+tar -xvf TradePaySSM_back_20161210051841.tar   TradePaySSM/WEB-INF/classes/zfbinfo.properties 
+tgz跟tar.gz是一样的 
+tar zxvf XX.tar.gz 即可
+例：查看usr.tar备份文件的内容，并以分屏方式显示在显示器上。
+$ tar tvf usr.tar | more
+例：把/home目录下包括它的子目录全部做备份文件，备份文件名为usr.tar。
+$ tar cvf usr.tar /home
+例：把/home目录下包括它的子目录全部做备份文件，并进行压缩，备份文件名为usr.tar.gz 。　　
+$ tar czvf usr.tar.gz /home
+tar -cvf xx.tar /home/ wenjianjia
+tar -xvf xx.tar
+tar -tvf xx.tar列出tar包内容
+tar -xvf filename.tar -C test/  #将filename.tar 解压到 test目录下面
+gzip 压缩：gzip filename //生成.gz的文件
+解压：gzip -d filename.gz //解压文件
+gzip -c  ctl.tar > ctl.tar.gz  压缩后不删除源文件
+gzip -v oracle.sql  #压缩后源文件不存在
+zcat oracle.sql #查看压缩后的文件 只能是单个文本文件压缩后去查看
+gzip -d  filename# 来进行解压缩 gunzip filename解压文件
+gzip -9 -c man.config > man.config.gz 将man.config 用最佳的压缩比压缩，并保留原本的档案
+bzip2 [-cdkzv#] 檔名
+bzcat 檔名.bz2
+bzip2 -z man.config
+bzcat man.config.bz2
+bzip2 -d man.config.bz2
+
+在Linux中，如果要让进程在后台运行，一般情况下，我们在命令后面加上&即可，实际上，这样是将命令放入到一个作业队列中了：
+$ ./test.sh & [1] 17208  $ jobs -l [1]+ 17208 Running                 ./test.sh & 对于已经在前台执行的命令，也可以重新放到后台执行，首先按ctrl+z暂停已经运行的进程，然后使用bg命令将停止的作业放到后台运行：
+$ ./test.sh [1]+  Stopped                 ./test.sh  $ bg %1 [1]+ ./test.sh &  $ jobs -l [1]+ 22794 Running                 ./test.sh & 
+
+cd /mnt/software/ftpclient/ && rm  -rf 2017-01-19  同时执行多个命令
+
+ ps -ef|grep schedul.jar|grep -v grep   查看jar进程是否存在
+#!/bin/sh
+ ps -ef|grep schedul.jar|grep -v grep
+if [ $? -ne 0 ]
+then
+echo "start process....."
+else
+echo "runing....."
+fi
+#####
+processString 表示进程特征字符串，能够查询到唯一进程的特征字符串
+0表示存在的
+$? -ne 0 不存在，$? -eq 0 存在
+
+mail -s "schedul.jar宕掉" guolinit@163.com < /home/tomcat/soft/logs/ftpDownload.log
+
+*/15  * * * *  sh  /home/tomcat/soft/check.sh >> /home/tomcat/soft/check.log
+
+jar -xvf pay.war WEB-INF/classes/zfbinfo.properties  解压部分文件
+jar -uvf pay.war WEB-INF/classes/zfbinfo.properties  替换指定文件多个中间用空格隔开
+jar 解压jar文件中指定的文件    jar xvf  schedul.jar ftp.properties
+jar uvf schedul.jar ftp.properties   替换jar包指定的文件 
+jar vtf fileName.jar	#查看jar内容
+jar vtf fileName.war	查看war内容
+获取shell文件当前所在目录
+方式一
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 
+echo $DIR  
+方式二
+Cur_Dir=$(pwd) 
+echo $Cur_Dir 
+方式三
+basepath=$(cd `dirname $0`; pwd)
+echo $basepath
+
+Linux设置文件夹可读写但是不能删除权限命令
+此权限时使用命令chattr的a属性来设置的，具体命令为： 
+sudo chattr +a file(filename) 
+取消此权限命令： 
+sudo chattr -a file(filename)
+若递归的设置文件夹的此种权限，使用-R属性： 
+sudo chattr +a -R file(filename) 
+递归取消文件夹的此属性： 
+sudo chattr -a -R file(filename)
+
+
+
+检测是否配置正确
+/usr/local/nginx/sbin/nginx -t
+重启服务
+/usr/local/nginx/sbin/nginx -s reload
+Nginx [emerg]: bind() to 0.0.0.0:80 failed (98: Address already in use) 
+使用命令关闭占用80端口的程序
+sudo fuser -k 80/tcp
+
+Linux下用 lsof 命令查找指定端口被哪个进程占用 
+lsof -i:123
+lsof -i:8080
+
+ping 自己不能ping通 ，且不能访问外网，但是可以input，那么新增一条正确input（比如8080）
+这样iptables配置文件会重新初始化
+
+
+cat /etc/sysconfig/iptables
+
+目前Linux没有直接查看创建文件的命令，你只能通过文件是否被修改过来进行判断
+//查看代码 
+stat 文件名 
+
+cmd  taskkill /pid  7620 -t -f  根据进程id杀死进程
+linux  kill -9 pid
+tomcat远程调试
+修改远程 catalina.sh 文件
+在下面增加一行(在 JPDA_ADDRESS="localhost:8000" 增加一行JPDA_ADDRESS="101.200.229.38:8000"  tomcat8验证通过  并把 JPDA_ADDRESS="localhost:8000注释掉)
+  if [ -z "$JPDA_ADDRESS" ]; then
+ #   JPDA_ADDRESS="localhost:8000"
+     #--- add by ctl
+     JPDA_ADDRESS="101.200.229.38:8000"  #默认127.0.0.1:8000  无法远程访问 8000端口
+启动     sh catalina.sh jpda start
+查看 端口   netstat -anop|grep 8000
+exlipse  debug>debug configureations >remote java application
+Project 选择要调试的应用  远程ip地址
+port 选择 JPDA_ADDRESS 配置的端口
+接下来解决80端口问题, 思路就是80去调用8080，或者映射端口。
+下面是影射方案,80 跳转 8080
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+取消跳转
+iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+查看规则
+iptables -t nat -L
+
+
+
+比方说，我想把当前目录下的全部文件移到某个子目录下，先建好目录
+mkdir myfolder
+mv * myfolder/
+虽然会报错 mv: cannot move `myfolder' to a subdirectory of itself, `myfolder/myfolder'的错误但是文件已经转移
+
+如查看 linux 某端口被映射到那个端口上 
+iptables -t nat -L -n | grep 80     (查看那个端口被映射到80端口上)
+_back_`date '+%Y%m%d%H%M%S'`
+在账户根目录下有.bashrc文件，
+root用户：/root/.bashrc
+ctl(普通用户)用户：/home/ctl/.bashrc
+编辑这个文件即可
+添加
+alias cdetc='cd /etc'
+alias cdroot='cd /root'
+保存退出后，注销再登录后，输入“cdetc”就相当于执行了“cd /etc”了
+语　　法：alias[别名]=[指令名称]
+参　　数 :若不加任何参数，则列出目前所有的别名设置。
+举    例 :ermao@lost-desktop:~$ alias
+                 alias egrep='egrep --color=auto'
+                 alias fgrep='fgrep --color=auto'
+                 alias grep='grep --color=auto'
+                 alias l='ls -CF'
+                 alias la='ls -A'
+                 alias ll='ls -alF'
+                 alias ls='ls --color=auto'
+说明：用户可利用alias，自定指令的别名。若仅输入alias，则可列出目前所有的别名设置。　alias的效力仅及于该次登入的操作。若要每次登入是即自动设好别名，可在/etc/profile或自己的~/.bashrc中设定指令的别名。
+删除别名的方法也很简单，如图要删除ipconfig的别名命令，只需要在alias命令前面添加un即可，命令写成# unalias ipconfig。
+
+删除除了某文件夹其他所有的文件
+ find -maxdepth 1 -not -name myfolder -not -name . -exec rm -rf {} \;
+find . -name '*portal*'   查找文件夹位置
+
+find . -name '*.exe' -type f -print -exec rm -rf {} \;
+递归删除某个文件夹或文件 
+cp file1 file2`date '+%Y%m%d%H%M%S'`     --生成的文件为file2时间
+ps -ef|grep 'svn*'
+ kill -9  pid
+Linux下怎么设置命令进入图形界面
+vi /etc/inittab
+id:3:initdefault:这一行，将3改为5
+cat filename  查看文件内容从文件第一行开始查看 -b 列出行号空白行不显示行号 -n空白行显示行号
+cat filename1  >> filename2  将filename1的内容增加都filename2的后面
+tac filename #查看文件内容但是从文件最后一行和cat相反
+tail filename #默认显示最后10行 tail -n 20 filename 显示最后20行  tail -n +6 filename 从第6行开始显示
+nl filename   #查看文件显示行号
+vi filename编辑
+进入vi后 i 开始编辑  退出先esc在： 在wq(保存)q!（不保存）
+:w 保存文件但不退出vi 
+:w file 将修改另外保存到file中，不退出vi 
+:w! 强制保存，不推出vi
+:wq 保存文件并退出vi 
+:wq! 强制保存文件，并退出vi
+:q 不保存文件，退出vi
+:q!不保存文件，强制退出vi 
+:e! 放弃所有修改，从上次保存文件开始再编辑 
+--显示当前行号
+在vi命令下输入 :nu
+--显示所有行号
+在vi命令下输入: set nu
+在vi命令下
+	dd删除一行
+	dw删除一个单词向右
+	dnw删除n个单词
+	nyy复制n行  p粘贴（当前光标的下一行开始粘贴）
+	G跳到最后一行
+	gg跳到第一行
+	nj向下跳n行
+	nk向上跳n行
+	nh向左移动n列
+	nl向右移动n列
+	CTRL+F向前翻页
+	CTRL+B向后翻页
+	CTRL+G向下移动半屏
+	dnl向右删除n个字母
+	dnk向左删除n个字母
+	dnj向下删除n行
+	dnk向上删除n行
+u   撤销上一步的操作
+Ctrl+r 恢复上一步被撤销的操作
+如何取消vi编辑器中突出显示的黄色字体
+:set nohls
+除去vim编辑器的黄色阴影
+前几天不知道在编码的时候，按了什么，每次打“，”，都会出现黄色的阴影，去网上查了才知道，原来以前不小心用/，查询了，所以要想去掉黄色的阴影，就用 /查询没有的单词,比如说/dddddddd就能解决这个问题了。
+设置行号很简单。
+我们要到命令模式下，输入set number
+:set number
+按下回车
+注释
+命令格式：起始行号，结束行号s#^#注释符#g
+例如；要注释2至5行
+2,5s#^#//#g  (2,5s#^#\##g  用#做注释符号 )
+反注释
+命令格式：起始行号，结束行号s#^注释符##g
+例如；要取消注释2至5行
+[plain] view plain copy
+2,5s#^//##g  (:77,82s#^\###g  取消77到82以#开头的注释)
+ 下怎么样删除从光标以后的内容  d$
+linux:vi 替换命令 
+:s/^.*$/\L&/100＃将100行内的小写转换成大写
+vi/vim 中可以使用 :s 命令来替换字符串。
+:s/vivian/sky/ 替换当前行第一个 vivian 为 sky
+:s/vivian/sky/g 替换当前行所有 vivian 为 sky
+:n,$s/vivian/sky/ 替换第 n 行开始到最后一行中每一行的第一个 vivian 为 sky
+:n,$s/vivian/sky/g 替换第 n 行开始到最后一行中每一行所有 vivian 为 sky
+n 为数字，若 n 为 .，表示从当前行开始到最后一行
+:%s/vivian/sky/（等同于 :g/vivian/s//sky/） 替换每一行的第一个 vivian 为 sky
+:%s/vivian/sky/g（等同于 :g/vivian/s//sky/g） 替换每一行中所有 vivian 为 sky
+可以使用 # 作为分隔符，此时中间出现的 / 不会作为分隔符
+:s#vivian/#sky/# 替换当前行第一个 vivian/ 为 sky/
+:%s+/oradata/apras/+/user01/apras1+ （使用+ 来 替换 / ）： /oradata/apras/替换成/user01/apras1/
+Ctrl+u：向文件首翻半屏；
+Ctrl+d：向文件尾翻半屏；
+Ctrl+f：向文件尾翻一屏；
+Ctrl+b：向文件首翻一屏；
+Esc：从编辑模式切换到命令模式；
+ZZ：命令模式下保存当前文件所做的修改后退出vi；
+:行号：光标跳转到指定行的行首；
+:$：光标跳转到最后一行的行首；
+x或X：删除一个字符，x删除光标后的，而X删除光标前的；
+D：删除从当前光标到光标所在行尾的全部字符；
+dd：删除光标行正行内容；
+ndd：删除当前行及其后n-1行；
+nyy：将当前行及其下n行的内容保存到寄存器？中，其中？为一个字母，n为一个数字；
+p：粘贴文本操作，用于将缓存区的内容粘贴到当前光标所在位置的下方；
+P：粘贴文本操作，用于将缓存区的内容粘贴到当前光标所在位置的上方；
+/字符串：文本查找操作，用于从当前光标所在位置开始向文件尾部查找指定字符串的内容，查找的字符串会被加亮显示；
+？name：文本查找操作，用于从当前光标所在位置开始向文件头部查找指定字符串的内容，查找的字符串会被加亮显示；
+a，bs/F/T：替换文本操作，用于在第a行到第b行之间，将F字符串换成T字符串。其中，“s/”表示进行替换操作；
+a：在当前字符后添加文本；
+A：在行末添加文本；
+i：在当前字符前插入文本；
+I：在行首插入文本；
+o：在当前行后面插入一空行；
+O：在当前行前面插入一空行；
+:wq：在命令模式下，执行存盘退出操作；
+:w：在命令模式下，执行存盘操作；
+:w！：在命令模式下，执行强制存盘操作；
+:q：在命令模式下，执行退出vi操作；
+:q！：在命令模式下，执行强制退出vi操作；
+:e文件名：在命令模式下，打开并编辑指定名称的文件；
+:n：在命令模式下，如果同时打开多个文件，则继续编辑下一个文件；
+:f：在命令模式下，用于显示当前的文件名、光标所在行的行号以及显示比例；
+:set number：在命令模式下，用于在最左端显示行号；
+:set nonumber：在命令模式下，用于在最左端不显示行号；
+ iostat -xdm 1 #系统级IO监控
+vim中w是下一个单词,b是上一个单词,这两个字母（w和b）
+
+du -sk * |sort -n  统计文件及文件的大小，并以从小到大排序
+--别名
+alais 19='ssh root@192.168.42.19'
+19 这样可以直接代替'ssh root@192.168.42.19'使用
+
+find / -type d -name "目录名" -printf "%h\n" --查找目录名所在的文件夹全路径
+1) ls -lt  时间最近的在前面
+2) ls -ltr 时间从前到后
+
+rz 上传文件
+sz filaname 下载文件
+Redhat关闭SELinux和防火墙
+1. 永久有效
+修改 /etc/selinux/config 文件中的 SELINUX="" 为 disabled ，然后重启
+2. 即时生效
+setenforce 0
+setenforce是Linux系统安全模块
+可以使用getenforce查看状态
+
+#更改文件夹的名字
+mv EhcacheServer4_19 Ehcache
+#更改文件的名字
+mv test.txt ctl.txt
+
+将/etc/passwd，有出现 root 的行取出来,并显示行号，并用红色显示
+ cat /etc/passwd |grep -n --color=auto 'root'
+将/etc/passwd，有出现 root 的行取出来,同时显示这些行在/etc/passwd的行号
+grep -n root /etc/passwd
+将/etc/passwd，将没有出现 root 的行取出来
+grep -v root /etc/passwd
+找到redis.conf中包含'pass'的地方（显示行号，且忽略大小写）
+grep -in 'pass' redis.conf
+
+sed -n '/^export/p' exports.log # 查找exports.log中以export开头的行
+1、删除文档的第一行
+sed -i '1d' <file>
+2、删除文档的最后一行
+sed -i '$d' <file>
+5、删除文件中包含某个关键字开头的所有行
+sed -i '/^QWQ/d' <file>
+6、删除文件中包含某个关键字的所有行 
+sed -i '/QWQ/d' <file>
+启动myeclipse 进入myeclipse安装目录，找到myeclipse文件所在路径 然后执行./myeclipse即可
+
+vi redis.conf
+[/关键字]:  进入vi命令后输入"/"然后输入要查到的关键字
+例如‘/pass’ 然后回车，如果回车后找到的不是要编辑的地方可以一直按'n'然后找到自己要编辑的地方
+按ESC 后  输入：w filename 将内容以指定的文件名保存
+:wq! #强制保存
+
+更改/etc/sysconfig下的network文件，在提示符下输入vi /etc/sysconfig/network，修改主机名
+
+top显示，管理执行中的程序
+
+
+No suitable device found  for connection "System eth0"  删除/etc/udev/rules.d/70-persistent-net.rules  然后重启
+如果还不行就用ifconfig -a 查看物理 MAC HWADDR	地址（eth0）然后将 /etc/sysconfig/network-scripts/ifcfg-eth0
+修改为查到的HWADDR	
+
+在linux里建立一个快捷方式
+ln -s /home/soft/MyEclipse/'MyEclipse 10' /home/soft/eclipse  对于有空格的路径用''括起来
+ln -s 源目录 目标快捷方式
+比如你要在/etc下面建立一个叫LXBC553的快捷方式，指向/home/LXBC，那就是
+ln -s /home/LXBC /etc/LXBC553 
+linux下建立软链接及删除软链接
+比如建立 ln -s /home/soft/apache-tomcat-7.0.11/logs  tomcatlog
+删除执行  rm -rf tomcatlog  (不是 tomcatlog/)
+
+
+
+查看/etc/profile的前10行内容，应该是：
+# head -n 10 /etc/profile
+查看/etc/profile的最后5行内容，应该是：
+# tail -n 5 /etc/profile
+如果想同时查看可以将前10行和后5行的显示信息通过输出重定向的方法保存到一个文档，这样查看文档即可一目了然。
+例如：
+将内容输出到/home/test文件中
+# head -n 10 /etc/profile >>/home/test
+# tail -n 5 /etc/profile>>/home/test
+查看的话只需要打开test文件即可。
+cat /home/test 
+cat test.txt|head -n 6|tail -n +3  显示从第3行第6行
+sed -n '3,6p' test.txt  显示从第3行第6行
+
+
+
+两个linux系统传递文件
+scp /home/temp/test.txt root@22.5.242.232:/home/files   然后会让输入密码
+scp -r /home/soft/jdk root@22.5.242.232:/home/files     拷贝文件夹
+scp -r -P 7841 jdk1.8.0_65.tar shareco888@103.235.230.215:/home/shareco888     7841为端口
+
+
+/media/sf_D_DRIVE  下面可以看到共享的文件夹
+
+$ chmod u+x file                　　　   给file的属主增加执行权限
+$ chmod 751 file                　　　   给file的属主分配读、写、执行(7)的权限，给file的所在组分配读、执行(5)的权限，给其他用户分配执行(1)的权限
+$ chmod u=rwx,g=rx,o=x file      上例的另一种形式
+$ chmod =r file                 　　　　为所有用户分配读权限
+$ chmod 444 file              　　　　 同上例
+$ chmod a-wx,a+r   file   　　 　   同上例
+$ chmod -R u+r directory       　   递归地给directory目录下所有文件和子目录的属主分配读的权限
+$ chmod 4755                          　　设置用ID，给属主分配读、写和执行权限，给组和其他用户分配读、执行的权限。
++增加权限
+-删除权限
+=重新分配权限
+r读
+w写
+x执行
+
+退出more只需按q即可
+gnome-terminal
+ll *term* 列出当前目录下包含term的文件
+find . -name '[r]*'   查找当前目录下以r开头的文件
+find / -name '*erminal*' 在根目录下查找名字包含 ‘erminal’ 的文件
+find . -name '*erminal*' 在当前目录下查找名字包含 ‘erminal’ 的文件
+1.按照文件名查找
+(1)find / -name httpd.conf　　#在根目录下查找文件httpd.conf，表示在整个硬盘查找
+(2)find /etc -name httpd.conf　　#在/etc目录下文件httpd.conf
+(3)find /etc -name '*srm*'　　#使用通配符*(0或者任意多个)。表示在/etc目录下查找文件名中含有字符串‘srm’的文件
+(4)find . -name 'srm*' 　　#表示当前目录下查找文件名开头是字符串‘srm’的文件
+(5)find . -type f -name "*.log" | xargs grep -n --color=auto  "*success*"   #在当前目录下搜索所有包含“success” 且以.log 结尾的文件
+(6)find . -type f -name "*.log" | xargs grep -n --color=auto  "*success*" |grep "root"   #在当前目录下搜索所有包含“success” 且以.log 结尾的文件且该行有字符串“root”
+find ./2017-04-30 -type f -name '*.txt'|xargs grep -n --color=auto '3582'
+
+
+
+find . -type f -name '*.sql'|xargs grep -n --color=auto 'revoke'
+find . -type f -name "*.log"|xargs grep -na --color=auto 'root'   (Binary file ... matches遇到这样的错误需要使用-na)
+find . -type f -exec sed -i 's/\xEF\xBB\xBF//' {} \;   --去除当前目录下所有文件bom头
+grep 文件报错 “Binary file ... matches”的处理
+抱着个错误是因为grep不能处理二进制的文件，
+-a, --text
+Process a binary file as if it were text; this is equivalent to the --binary-files=text option. 
+这个时候加上-a参数就解决了 
+
+非root用户1024以内不能用
+
+more filaname  一个文件内容多，每次enter向下看
+startx 进入界面
+
+vi /etc/hosts  修改host文件  主机名必须可以解析（安装redhat是输入的主机名 com.ctl.pc）。
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 com.ctl.pc
+
+
+
+linux tomcat配置的是8080端口通过下面命令外界可以使用80端口来访问tomcat
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080（重启后失效）
+2.service iptables save
+3.service iptables restart
+
+网络地址转换(NAT)--端口转发
+ftp   tcp   21  21
+http  tcp   80  80
+
+iptables端口转发命令
+需求很简单，把本地81端口映射到8080端口上
+1. 所有的81请求转发到了8080上.
+# iptables -t nat -A PREROUTING -p tcp --dport 81 -j REDIRECT --to-ports 8080
+如果需要本机也可以访问，则需要配置OUTPUT链：
+iptables -t nat -A OUTPUT -p tcp --dport 81 -j REDIRECT --to-ports 8080
+原因：外网访问需要经过PREROUTING链，但是localhost不经过该链，因此需要用OUTPUT，或者POSTROUTING。POSTROUTING不行，需要看看。
+
+
+将VirtualBox Host-Only Network
+ip设置为IPADDR=192.168.1.6
+NETMASK=255.255.255.0
+NETMASK=255.255.255.0
+
+使用VirtualBox host-only 
+VirtualBox Host-Only Network
+配置为
+DNS=192.168.42.1
+NETMASK=255.255.255.0
+IPADDR=192.168.42.6
+如何在linux系统中设置静态ip地址
+cd /etc/sysconfig/network-scripts/ifcfg-eth0
+
+DEVICE="eth0"
+HWADDR=08:00:27:42:D9:16
+TYPE=Ethernet
+UUID=5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03
+NM_CONTROLLED=yes
+ONBOOT=yes
+BOOTPROTO=static
+DNSI=192.168.42.1
+IPV6INIT=no
+USERCTL=no
+IPADDR=192.168.42.19
+NETMASK=255.255.255.0
+GATEWAY=192.168.42.1
+PREFIX=24
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=yes
+NAME="System eth0"
+
+
+重启网络服务。service network restart或/etc/init.d/network restart
+ifconfig eth0查询当前ip
+Linux重启网卡的方法# service network restart
+查找文件路径  whereis   filename
+source /etc/profile 让编辑后的profile立即生效
+
+用户切换
+su - 普通用户名
+mkdir  新建文件夹
+mkdir -p dir1/dir2 #建立多层文件夹
+mkdir -m 711 dir3 #新建权限为rwx--x--x的目录
+
+
+
+删除文件夹实例：
+rm -rf /var/log/httpd/access
+将会删除/var/log/httpd/access目录以及其下所有文件、文件夹
+
+删除文件使用实例：
+rm -f /var/log/httpd/access.log
+将会强制删除/var/log/httpd/access.log这个文件
+
+rpm -i 需要安装的包文件名
+举例如下：
+rpm -i example.rpm 安装 example.rpm 包；
+rpm -iv example.rpm 安装 example.rpm 包并在安装过程中显示正在安装的文件信息；
+rpm -ivh example.rpm 安装 example.rpm 包并在安装过程中显示正在安装的文件信息及安装进度；
+
+vsftpd
+使用linux的用户登录（可以下载上传该用户文件夹下面的数据）
+Starting vsftpd for vsftpd: 500 OOPS: cannot read config file: /etc/vsftpd/vsftpd.conf
+500 OOPS:cannot change directory:/root 问题
+阅读：86392010-01-14 09:47
+标签：杂谈
+安装完red hat enterprise linux 5后，ftp不能使用root用户，将/etc/vsftpd/ftpusers和/etc/vsftpd/user_list两个文件中的root注释掉，就是在root前加个#,再运行ftp结果报错
+500 OOPS:cannot change directory:/root
+到网上查了下，是selinux的配置问题，两种方法解决：
+1、setsebool -P ftp_home_dir on 之后再运service vsftpd restart
+或 setsebool -P ftpd_disable_trans on 之后再运service vsftpd restart 也行
+2、关闭selinux
+修改/etc/selinux/config文件或/etc/syscofnig/selinux设置SELINUX= disabled ，然后重启
+
+使用如下命令#rpm -qa |grep vsftpd可以检测出是否安装了vsftpd软件，
+如果没有安装，使用YUM命令进行安装。（yum install vsftpd -y）
+启动ftp命令#service vsftpd start
+停止ftp命令#service vsftpd stop
+重启ftp命令#service vsftpd restart
+安装好vsftpd 访问ftp时 报需要设置    setsebool ftp_home_dir 1（直接在终端命令行输入）
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+两项前面的#号，就可以完成匿名用户的配置，此时匿名用户既可以登录上传、下载文件。记得修改配置文件后需要重启服务。
+ftp的用户名密码和linux登录的用户名密码一致
+chown -R ctl:ctl /soft 给ftp非配目录权限 可以访问根目录下面的soft文件夹
+安装gftp时报错 ，stropts.h不存在需要进入 gftp中lib文件夹下，找到pty.c将 #include <stropts.h>删除掉即可
+安装好gftp后使用gftp命令登录例如  gftp 192.168.0.111
+tar.gz 是用tar命令将源码文件打包成一个文件，然后用zip命令压缩成一个压缩包，所以在安装前要解压缩，命令如下：tar -xvzf test.tar.gz完成后会生成一个解压缩后的目录，进入该目录，查看readme文件或者install文件，里面有详细的安装命令。一般的安装步骤是./configure  回车make  回车make install  回车make clean  回车如果configure没有通过，说明你的系统环境没有达到要求，该软件所依赖的文件没有被安装，需要根据提示信息来具体分析。以上的各个命令只是最常用的使用方式，还有比较实用的参数没有介绍，可以自己查看帮助文档。
+
+如何关闭防火墙
+/etc/init.d/iptables restart  
+     #最后重启防火墙使配置生效
+1) 重启后生效 
+开启： chkconfig iptables on 
+关闭： chkconfig iptables off 
+2) 即时生效，重启后失效 
+开启： service iptables start 
+关闭： service iptables stop 
+service  iptables  status        查看防火墙状态
+service  iptables  start           开启防火墙
+service  iptables  stop           关闭防火墙
+service  iptables  restart        重启防火墙
+
+RedHat 开放防火墙端口
+1. cd到/sbin目录，执行命令:
+iptables -I INPUT -p tcp --dport 1158 -j ACCEPT
+2.service iptables save
+3.service iptables restart
+防火墙开放特定端口：
+/etc/sysconfig/iptables
+ ②添加：
+-A INPUT -m state  --state NEW -m tcp -p tcp --dport 80 -j ACCEPT（允许80端口通过防火墙） 
+-A INPUT -m state  --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT（允许3306端口通过防火墙）
+
+
+       ★数字8080代表开放8080端口，也可以改成其他的端口★
+③重启防火墙
+================================================================
+保存对防火墙的设置
+serivce iptables save
+查看iptables规则及编号
+iptables -nL --line-number
+关闭所有的INPUT FORWARD（转发） OUTPUT的所有端口
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+只打开22端口
+iptables -A  INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+参数讲解：
+–A 参数就看成是添加一条规则
+–p 指定是什么协议，我们常用的tcp 协议，当然也有udp，例如53端口的DNS
+–dport 就是目标端口，当数据从外部进入服务器为目标端口
+–sport 数据从服务器出去，则为数据源端口使用 
+–j 就是指定是 ACCEPT -接收 或者 DROP 不接收
+禁止某个IP访问
+iptables -A INPUT -p tcp -s 192.168.1.2 -j DROP
+–s 参数是来源（即192.168.1.2）
+后面拒绝就是DROP 
+删除规则
+iptables -D INPUT 2
+删除INPUT链编号为2的规则
+
+
+关机命令如下：
+1、halt 立刻关机 
+2、poweroff 立刻关机 
+3、shutdown -h now 立刻关机(root用户使用) 
+4、shutdown -h 10 10分钟后自动关机 
+
+linux如何关闭防火墙
+1) 重启后生效 
+开启： chkconfig iptables on 
+关闭： chkconfig iptables off 
+2) 即时生效，重启后失效 
+开启： service iptables start 
+关闭： service iptables stop 
+
+文件拷贝   cp ./soft/a/1.txt  ./soft/b/1.txt 
+文件夹拷贝 cp -r 文件夹1 文件夹2  #文件拷贝包含子目录
+文件夹拷贝 cp -i dir2 dir3 #拷贝时提示是否覆盖重复的文件
+文件夹拷贝 cp -a dir2 dir3 #拷贝时整个数据属性一模一样，包括更改时间属性
+
+jdk安装
+ vi  /etc/profile
+#jdk
+export JAVA_HOME="/home/soft/jdk1.7.0_10"
+export HADOOP_HOME="/home/soft/hadoop-1.1.2"
+export ZOOKEEPER_HOME="/home/soft/zookeeper-3.4.5"
+export HBASE_HOME="/home/soft/hbase"
+export PYTHON_HOME="/opt/ActivePython-3.6"
+export PATH="$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$ZOOKEEPER_HOME/bin:$HBASE_HOME/bin:$PYTHON_HOME/bin" 
+export JRE_HOME="$JAVA_HOME/jre"
+export CLASSPATH=".:$JAVA_HOME/lib:$JRE_HOME/lib"
+export DISPLAY=127.0.0.1:0.0 
+export MYECLIPSE_HOME="/home/soft/MyEclipse/MyEclipse 10"
+#tomcat
+export CATALINA_HOME="/home/soft/apache-tomcat-7.0.11"
+export PATH="$PATH:$CATALINA_HOME/bin:/home/soft/unzip-5.52"
+source /etc/profile 立即生效
+
+
+mysql问题
+edora8启动mysql 报错：
+ERROR 2002 (HY000): Can’t connect to local MySQL server through socket ‘/var/lib/mysql/mysql.sock’ (2)
+1、先查看 /etc/rc.d/init.d/mysqld status 看看m y s q l 是否已经启动.
+另外看看是不是权限问题.
+2、确定你的mysql.sock是不是在那个位置，
+mysql -u 你的mysql用户名 -p -S /var/lib/mysql/mysql.sock
+3、试试：service mysqld start
+4、如果是权限问题，则先改变权限 #chown -R mysql:mysql /var/lib/mysql   （要执行）
+[root@localhost ~]# /etc/init.d/mysqld start
+启动 MySQL： [ 确定 ]
+[root@localhost ~]# mysql -uroot -p
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+原因是，/var/lib/mysql 的访问权限问题。
+shell> chown -R mysql:mysql /var/lib/mysql
+接着启动服务器
+shell> /etc/init.d/mysql start
+服务器正常启动后察看 /var/lib/mysql 自动生成mysql.sock文件。
+但是我的问题仍然没有得到解决。
+问题终于解决：
+方法： 修改/etc/my.conf:
+[mysqld] 
+datadir=/usr/local/mysql/data 
+socket=/var/lib/mysql/mysql.sock 
+[mysql.server] 
+user=mysql 
+basedir=/usr/local/mysql 
+If there is not currently a section called [client], add one at the bottom of the file and copy the socket= line under the [mysqld] section such as: 
+[client] 
+socket=/var/lib/mysql/mysql.sock 
+发现依旧如此，运行/etc/init.d/mysql start报错：Starting MySQLCouldn't find MySQL manager or server 
+是mysqld服务没启，运行/usr/local/mysql/bin/mysqld_safe &
+
+root用户也不让保存则使用  wq!
+
+Linux添加/删除用户和用户组
+本文总结了Linux添加或者删除用户和用户组时常用的一些命令和参数。
+1、建用户：
+adduser phpq                             //新建phpq用户
+passwd phpq                               //给phpq用户设置密码
+
+2、建工作组
+groupadd test                          //新建test工作组
+
+3、新建用户同时增加工作组
+useradd -g test phpq                      //新建phpq用户并增加到test工作组
+
+注：：-g 所属组 -d 家目录 -s 所用的SHELL
+
+
+4、给已有的用户增加工作组
+usermod -G groupname username
+
+或者：gpasswd -a user group
+
+5、临时关闭：在/etc/shadow文件中属于该用户的行的第二个字段（密码）前面加上*就可以了。想恢复该用户，去掉*即可。
+
+或者使用如下命令关闭用户账号：
+passwd peter –l
+
+重新释放：
+passwd peter –u
+
+6、永久性删除用户账号
+userdel peter
+
+groupdel peter
+
+usermod –G peter peter   （强制删除该用户的主目录和主目录下的所有文件和子目录）
+
+7、从组中删除用户
+编辑/etc/group 找到GROUP1那一行，删除 A
+或者用命令
+gpasswd -d A GROUP
+
+8、显示用户信息
+id user
+cat /etc/passwd
+
+更详细的用户和用户组的解说请参考
+Linux 用户和用户组详细解说
+本文主要讲述在Linux 系统中用户(user)和用户组(group)管理相应的概念；用户(user)和用户组(group)相关命令的列举；其中也对单用户多任务，多用户多任务也做以解说。
+
+本篇文章来源于 PHP资讯 原文链接：http://www.phpq.net/linux/linux-add-delete-user-group.html
+
+ vi /etc/sudoers  添加
+username	ALL=(ALL) 	ALL
+这样username将和 root用户一样用有权限
+Linux 用户（user）和用户组（group）管理概述
+
+date '+%Y/%m/%d %H:%M:%S'       #date '+%Y-%m-%d %H:%M:%S:%s'
+free -m内存清理
+last 列出目前与过去登入系统的用户相关信息
+last -n 10 （显示10条）
+、理解Linux的单用户多任务，多用户多任务概念；
+
+
+
+ls *term*查询当前目录下包含term的文件
+  su username 登录后不包含username的环境
+  su - username 登录后包含username的环境
+
+
+
+
+
+
+
+
+Linux 是一个多用户、多任务的操作系统；我们应该了解单用户多任务和多用户多任务的概念；
+1、Linux 的单用户多任务；
+单用户多任务；比如我们以beinan 登录系统，进入系统后，我要打开gedit 来写文档，但在写文档的过程中，我感觉少点音乐，所以又打开xmms 来点音乐；当然听点音乐还不行，MSN 还得打开，想知道几个弟兄现在正在做什么，这样一样，我在用beinan 用户登录时，执行了gedit 、xmms以及msn等，当然还有输入法fcitx ；这样说来就有点简单了，一个beinan用户，为了完成工作，执行了几个任务；当然beinan这个用户，其它的人还能以远程登录过来，也能做其它的工作。
+2、Linux 的多用户、多任务；
+有时可能是很多用户同时用同一个系统，但并不所有的用户都一定都要做同一件事，所以这就有多用户多任务之说；
+举个例子，比如LinuxSir.Org 服务器，上面有FTP 用户、系统管理员、web 用户、常规普通用户等，在同一时刻，可能有的弟兄正在访问论坛；有的可能在上传软件包管理子站，比如luma 或Yuking 兄在管理他们的主页系统和FTP ；在与此同时，可能还会有系统管理员在维护系统；浏览主页的用的是nobody 用户，大家都用同一个，而上传软件包用的是FTP用户；管理员的对系统的维护或查看，可能用的是普通帐号或超级权限root帐号；不同用户所具有的权限也不同，要完成不同的任务得需要不同的用户，也可以说不同的用户，可能完成的工作也不一样；
+值得注意的是：多用户多任务并不是大家同时挤到一接在一台机器的的键盘和显示器前来操作机器，多用户可能通过远程登录来进行，比如对服务器的远程控制，只要有用户权限任何人都是可以上去操作或访问的；
+3、用户的角色区分；
+用户在系统中是分角色的，在Linux 系统中，由于角色不同，权限和所完成的任务也不同；值得注意的是用户的角色是通过UID和识别的，特别是UID；在系统管理中，系统管理员一定要坚守UID 唯一的特性；
+root 用户：系统唯一，是真实的，可以登录系统，可以操作系统任何文件和命令，拥有最高权限；
+虚拟用户：这类用户也被称之为伪用户或假用户，与真实用户区分开来，这类用户不具有登录系统的能力，但却是系统运行不可缺少的用户，比如bin、daemon、adm、ftp、mail等；这类用户都系统自身拥有的，而非后来添加的，当然我们也可以添加虚拟用户；
+普通真实用户：这类用户能登录系统，但只能操作自己家目录的内容；权限有限；这类用户都是系统管理员自行添加的；
+4、多用户操作系统的安全；
+多用户系统从事实来说对系统管理更为方便。从安全角度来说，多用户管理的系统更为安全，比如beinan用户下的某个文件不想让其它用户看到，只是设置一下文件的权限，只有beinan一个用户可读可写可编辑就行了，这样一来只有beinan一个用户可以对其私有文件进行操作，Linux 在多用户下表现最佳，Linux能很好的保护每个用户的安全，但我们也得学会Linux 才是，再安全的系统，如果没有安全意识的管理员或管理技术，这样的系统也不是安全的。
+从服务器角度来说，多用户的下的系统安全性也是最为重要的，我们常用的Windows 操作系统，它在系纺权限管理的能力只能说是一般般，根本没有没有办法和Linux或Unix 类系统相比；
+二、用户(user）和用户组（group）概念；
+1、用户（user）的概念；
+通过前面对Linux 多用户的理解，我们明白Linux 是真正意义上的多用户操作系统，所以我们能在Linux系统中建若干用户（user）。比如我们的同事想用我的计算机，但我不想让他用我的用户名登录，因为我的用户名下有不想让别人看到的资料和信息（也就是隐私内容）这时我就可以给他建一个新的用户名，让他用我所开的用户名去折腾，这从计算机安全角度来说是符合操作规则的；
+当然用户（user）的概念理解还不仅仅于此，在Linux系统中还有一些用户是用来完成特定任务的，比如nobody和ftp 等，我们访问LinuxSir.Org 的网页程序，就是nobody用户；我们匿名访问ftp 时，会用到用户ftp或nobody ；如果您想了解Linux系统的一些帐号，请查看 /etc/passwd ；
+2、用户组（group）的概念；
+用户组（group）就是具有相同特征的用户（user）的集合体；比如有时我们要让多个用户具有相同的权限，比如查看、修改某一文件或执行某个命令，这时我们需要用户组，我们把用户都定义到同一用户组，我们通过修改文件或目录的权限，让用户组具有一定的操作权限，这样用户组下的用户对该文件或目录都具有相同的权限，这是我们通过定义组和修改文件的权限来实现的；
+举例：我们为了让一些用户有权限查看某一文档，比如是一个时间表，而编写时间表的人要具有读写执行的权限，我们想让一些用户知道这个时间表的内容，而不让他们修改，所以我们可以把这些用户都划到一个组，然后来修改这个文件的权限，让用户组可读，这样用户组下面的每个用户都是可读的；
+用户和用户组的对应关系是：一对一、多对一、一对多或多对多；
+一对一：某个用户可以是某个组的唯一成员；
+多对一：多个用户可以是某个唯一的组的成员，不归属其它用户组；比如beinan和linuxsir两个用户只归属于beinan用户组；
+一对多：某个用户可以是多个用户组的成员；比如beinan可以是root组成员，也可以是linuxsir用户组成员，还可以是adm用户组成员；
+多对多：多个用户对应多个用户组，并且几个用户可以是归属相同的组；其实多对多的关系是前面三条的扩展；理解了上面的三条，这条也能理解；
+
+
+三、用户（user）和用户组（group）相关的配置文件、命令或目录；
+1、与用户（user）和用户组（group）相关的配置文件；
+1）与用户（user）相关的配置文件；
+/etc/passwd 注：用户（user）的配置文件；
+/etc/shadow 注：用户（user）影子口令文件；
+2）与用户组（group）相关的配置文件；
+/etc/group 注：用户组（group）配置文件；
+/etc/gshadow 注：用户组（group）的影子文件；
+2、管理用户（user）和用户组（group）的相关工具或命令；
+1）管理用户（user）的工具或命令；
+useradd    注：添加用户 
+adduser    注：添加用户
+passwd     注：为用户设置密码
+usermod  注：修改用户命令，可以通过usermod 来修改登录名、用户的家目录等等；
+pwcov       注：同步用户从/etc/passwd 到/etc/shadow 
+pwck         注：pwck是校验用户配置文件/etc/passwd 和/etc/shadow 文件内容是否合法或完整；
+pwunconv  注：是pwcov 的立逆向操作，是从/etc/shadow和 /etc/passwd 创建/etc/passwd ，然后会删除 /etc/shadow 文件；
+finger        注：查看用户信息工具
+id              注：查看用户的UID、GID及所归属的用户组
+chfn          注：更改用户信息工具
+su             注：用户切换工具
+sudo         注：sudo 是通过另一个用户来执行命令（execute a command as another user），su 是用来切换用户，然后通过切换到的用户来完成相应的任务，但sudo 能后面直接执行命令，比如sudo 不需要root 密码就可以执行root 赋与的执行只有root才能执行相应的命令；但得通过visudo 来编辑/etc/sudoers来实现；
+visudo      注：visodo 是编辑 /etc/sudoers 的命令；也可以不用这个命令，直接用vi 来编辑 /etc/sudoers 的效果是一样的；
+sudoedit  注：和sudo 功能差不多；
+
+2）管理用户组（group）的工具或命令；
+groupadd  注：添加用户组；
+groupdel         注：删除用户组；
+groupmod        注：修改用户组信息
+groups     注：显示用户所属的用户组
+grpck
+grpconv   注：通过/etc/group和/etc/gshadow 的文件内容来同步或创建/etc/gshadow ，如果/etc/gshadow 不存在则创建；
+grpunconv   注：通过/etc/group 和/etc/gshadow 文件内容来同步或创建/etc/group ，然后删除gshadow文件；
+ 
+3、/etc/skel 目录；
+
+/etc/skel目录一般是存放用户启动文件的目录，这个目录是由root权限控制，当我们添加用户时，这个目录下的文件自动复制到新添加的用户的家目录下；/etc/skel 目录下的文件都是隐藏文件，也就是类似.file格式的；我们可通过修改、添加、删除/etc/skel目录下的文件，来为用户提供一个统一、标准的、默认的用户环境；
+[root@localhost beinan]# ls -la /etc/skel/
+总用量 92
+drwxr-xr-x    3 root root  4096  8月 11 23:32 .
+drwxr-xr-x  115 root root 12288 10月 14 13:44 ..
+-rw-r--r--    1 root root    24  5月 11 00:15 .bash_logout
+-rw-r--r--    1 root root   191  5月 11 00:15 .bash_profile
+-rw-r--r--    1 root root   124  5月 11 00:15 .bashrc
+-rw-r--r--    1 root root  5619 2005-03-08  .canna
+-rw-r--r--    1 root root   438  5月 18 15:23 .emacs
+-rw-r--r--    1 root root   120  5月 23 05:18 .gtkrc
+drwxr-xr-x    3 root root  4096  8月 11 23:16 .kde
+-rw-r--r--    1 root root   658 2005-01-17  .zshrc
+ 
+
+/etc/skel 目录下的文件，一般是我们用useradd 和adduser 命令添加用户（user）时，系统自动复制到新添加用户（user）的家目录下；如果我们通过修改 /etc/passwd 来添加用户时，我们可以自己创建用户的家目录，然后把/etc/skel 下的文件复制到用户的家目录下，然后要用chown 来改变新用户家目录的属主；
+
+4、/etc/login.defs 配置文件；
+
+/etc/login.defs 文件是当创建用户时的一些规划，比如创建用户时，是否需要家目录，UID和GID的范围；用户的期限等等，这个文件是可以通过root来定义的；
+
+比如Fedora 的 /etc/logins.defs 文件内容；
+
+# *REQUIRED*
+#   Directory where mailboxes reside, _or_ name of file, relative to the
+#   home directory.  If you _do_ define both, MAIL_DIR takes precedence.
+#   QMAIL_DIR is for Qmail
+#
+#QMAIL_DIR      Maildir
+MAIL_DIR        /var/spool/mail  注：创建用户时，要在目录/var/spool/mail中创建一个用户mail文件；
+#MAIL_FILE      .mail
+
+# Password aging controls:
+#
+#       PASS_MAX_DAYS   Maximum number of days a password may be used.
+#       PASS_MIN_DAYS   Minimum number of days allowed between password changes.
+#       PASS_MIN_LEN    Minimum acceptable password length.
+#       PASS_WARN_AGE   Number of days warning given before a password expires.
+#
+PASS_MAX_DAYS   99999   注：用户的密码不过期最多的天数；
+PASS_MIN_DAYS   0       注：密码修改之间最小的天数；
+PASS_MIN_LEN    5       注：密码最小长度；
+PASS_WARN_AGE   7       注：
+
+#
+# Min/max values for automatic uid selection in useradd
+#
+UID_MIN                   500  注：最小UID为500 ，也就是说添加用户时，UID 是从500开始的；
+UID_MAX                 60000   注：最大UID为60000；
+
+#
+# Min/max values for automatic gid selection in groupadd
+#
+GID_MIN                   500   注：GID 是从500开始；
+GID_MAX                 60000
+
+#
+# If defined, this command is run when removing a user.
+# It should remove any at/cron/print jobs etc. owned by
+# the user to be removed (passed as the first argument).
+#
+#USERDEL_CMD    /usr/sbin/userdel_local
+
+#
+# If useradd should create home directories for users by default
+# On RH systems, we do. This option is ORed with the -m flag on
+# useradd command line.
+#
+CREATE_HOME     yes   注：是否创用户家目录，要求创建；
+ 
+
+
+5、/etc/default/useradd 文件；
+
+通过useradd 添加用户时的规则文件；
+
+# useradd defaults file
+GROUP=100
+HOME=/home  注：把用户的家目录建在/home中；
+INACTIVE=-1  注：是否启用帐号过期停权，-1表示不启用；
+EXPIRE=   注：帐号终止日期，不设置表示不启用；
+SHELL=/bin/bash  注：所用SHELL的类型；
+SKEL=/etc/skel   注： 默认添加用户的目录默认文件存放位置；也就是说，当我们用adduser添加用户时，用户家目录下的文件，都是从这个目录中复制过去的；
+ 
+
+
+
+# uname -a # 查看内核/操作系统/CPU信息
+# head -n 1 /etc/issue # 查看操作系统版本
+# cat /proc/cpuinfo # 查看CPU信息
+# hostname # 查看计算机名
+# lspci -tv # 列出所有PCI设备
+# lsusb -tv # 列出所有USB设备
+# lsmod # 列出加载的内核模块
+# env # 查看环境变量 资源
+# free -m # 查看内存使用量和交换区使用量
+# df -h # 查看各分区使用情况
+# df -hl # 查看各分区使用情况
+# du -sh # 查看指定目录的大小    du -b paymanagerdb.tar.gz(字节)  du -k paymanagerdb.tar.gz(KB)   du -m paymanagerdb.tar.gz (MB)
+# grep MemTotal /proc/meminfo # 查看内存总量
+# grep MemFree /proc/meminfo # 查看空闲内存量
+# uptime # 查看系统运行时间、用户数、负载
+# cat /proc/loadavg # 查看系统负载 磁盘和分区
+# mount | column -t # 查看挂接的分区状态
+# fdisk -l # 查看所有分区
+# swapon -s # 查看所有交换分区
+# hdparm -i /dev/hda # 查看磁盘参数(仅适用于IDE设备)
+# dmesg | grep IDE # 查看启动时IDE设备检测状况 网络
+# ifconfig # 查看所有网络接口的属性
+# iptables -L # 查看防火墙设置
+# route -n # 查看路由表
+# netstat -lntp # 查看所有监听端口
+# netstat -antp # 查看所有已经建立的连接
+# netstat -s # 查看网络统计信息 进程
+# ps -ef # 查看所有进程
+# top # 实时显示进程状态 用户
+# w # 查看活动用户
+# id # 查看指定用户信息
+# last # 查看用户登录日志
+# cut -d: -f1 /etc/passwd # 查看系统所有用户
+# cut -d: -f1 /etc/group # 查看系统所有组
+# crontab -l # 查看当前用户的计划任务 服务
+# chkconfig –list # 列出所有系统服务
+# chkconfig –list | grep on # 列出所有启动的系统服务 程序
+# rpm -qa # 查看所有安装的软件包
+
+ls -al #显示隐藏文件
+[ctl@com ~]$ date '+%Y-%m-%d %H:%M:%S:%s' #显示年月日时分秒 2016-05-07 16:07:04:1462608424
+时间设置
+我们一般使用“date -s”命令来修改系统时间
+比如将系统时间设定成2011年7月13日的命令：date -s 07/13/2011
+将系统时间设定成11点12分0秒的命令：date -s 11:12:00
+注意：这里说的是系统时间，是linux由操作系统维护的。
+在系统启动时，Linux操作系统将时间从CMOS中读到系统时间变量中，以后修改时间通过修改系统时间实现。为了保持系统时间与CMOS时间的一致性，Linux每隔一段时间会将系统时间写入CMOS。由于该同步是每隔一段时间（大约是11分钟）进行的，在我们执行date -s后，如果马上重起机器，修改时间就有可能没有被写入CMOS,这就是问题的原因。
+如果要确保修改生效可以执行如下命令。
+#clock –w
+这个命令强制把系统时间写入CMOS。 
+
+[ctl@com ~]$ cal 6 2016  # 日历2016年6月
+      June 2016     
+Su Mo Tu We Th Fr Sa
+          1  2  3  4
+ 5  6  7  8  9 10 11
+12 13 14 15 16 17 18
+19 20 21 22 23 24 25
+26 27 28 29 30
+bc  #打开计算器
+man 后面跟命令可以查看 命令的详细使用方法，如果要退出man需要按下'q'
+nano命令文件编辑 nano是一个字符终端的文本编辑器，有点像DOS下的editor程序。它比vi/vim要简单得多，比较适合Linux初学者使用。某些Linux发行版的默认编辑器就是nano。
+free -m 看啊看内存
+
+文件属性
+1,ls
+    ls -a 查看所有文件
+    ls -l 查看详细的属性
+2,lsattr
+    查看文件的扩展属性,
+    如果文件被　chattr +i   添加了写保护,
+    用lsattr可以看到添加的属性
+3,file
+查看文件的类型
+4,stat
+    查看文件的状态
+
+chgrp #改变文件所属用户组
+chown#改变文件所有者
+chmod#改变文件权限r=4,w=2,x=1   u代表user，g代表group，o代表other，a代表all ，+(加入)、-(除去)、=(设置)  rwx 文件或目录 -R代表递归
+chmod u=rwx,go=rx test.txt
+chmod a-x  startup.sh #全部去掉可执行权限
+每种身份（owner，group，others）各自的权限（r、w、x）分数是需要累加的，例如[-rwxrwx---],分数为
+ owner=4+2+1=7
+group=4+2+1=7
+others==0+0+=0=0
+
+
+2、方法2，需要在当前文件夹中进行:
+rm -rf !(keep) #删除keep文件之外的所有文件
+rm -rf !(keep1 | keep2) #删除keep1和keep2文件之外的所有文件
+
+
+linux下删除指定文件之外的其他文件
+ 
+一、Linux下删除文件和文件夹常用命令如下：
+删除文件： rm file  www.2cto.com  
+删除文件夹： rm -rf dir
+需要注意的是， rmdir 只能够删除 空文件夹。
+ 
+二、删除制定文件（夹）之外的所有文件呢？
+ 
+1、方法1，比较麻烦的做法是：
+复制需要保留的文件到其他文件夹，然后将该目录删除， 然后将需要保留的移动 回来。
+mv keep ../ #保留文件（夹） keep
+rm -rf * #删除当前文件夹里的所有文件
+mv ../keep ./ #将原来的东西移动回来
+ 
+2、方法2，需要在当前文件夹中进行:
+rm -rf !(keep) #删除keep文件之外的所有文件
+rm -rf !(keep1 | keep2) #删除keep1和keep2文件之外的所有文件
+ 
+3、方法3，当前文件夹中结合使用grep和xargs来处理文件名：
+ls | grep -v keep | xargs rm #删除keep文件之外的所有文件
+说明： ls先得到当前的所有文件和文件夹的名字， grep -v keep，进行grep正则匹配查找keep，-v参数决定了结果为匹配之外的结果，也就是的到了keep之外的所有文件名，然后 xargs用于从 标准输入获得参数 并且传递给后面的命令，这里使用的命令是 rm，然后由rm删除前面选择的文件。
+好处：使用了grep来正则表达式来匹配文件名字，可以一次保留多个文件，从而进行更加准确的处理。
+ 
+4、方法4，使用find命令代替ls，改进方法3从而能够处理制定文件夹的文件：
+find ./test/ | grep -v keep | xargs rm #删除当前test文件夹中keep文件之外的所有文件
+说明，用grep而不用find -name选取名字，因为find选取名字时比较麻烦，对正则表达式支持不够，无法排除指定文件名。
+ 
+5、方法5，直接使用find命令删除其他文件：
+find ./ -name '[^k][^e][^e][^p]*'  -exec rm -rf {} \; #删除keep以外的其他文件。
+find ./ -name '[^k][^e][^e][^p]*'  | xargs rm -rf  #删除keep以外的其他文件。推荐！
+说明：上面第二行的代码效率高些，原因在于删除多个文件时 -exec会启动多个进程来处理，而xargs会启动一个rm进程来处理。
+
+
+定时任务
+crontab -e  回车后
+输入要执行的定时任务例如
+1-59 * * * * echo "Good morning." >> /tmp/test.txt  #没分钟执行一次向test.txt文件中输入 Good morning.
+-e 表示编辑当前的crontab
+-l  表示列表显示当前的crontab任务
+-r  表示删除当前用户的crontab
+-i  表示删除crontab时给予提示信息
+crontab 运行日志保存在/var/log目录下
+
+使用crontab -e 创建一个定时任务，其会打开一个任务文件，将需要添加的任务添加到任务文件中，添加格式如下：
+分    小时  日    月    星期  命令(取值范围,0表示周日,*表任意一天，一般一行对应一个任务)
+0-59  0-23  1-31  1-12  0-6   command
+cat /etc/ntp.conf  定时任务日志查看
+/usr/sbin/ntpdate -d ntp.sjtu.edu.cn   同步时间
+  
+
+2.定时任务的时间设置
+* * * * *　              每分钟执行
+*/1 * * * *　          每分钟执行
+0 5 * * *                每天五点执行
+0-59/2 * * * *        每隔两分钟执行，且是偶数分钟执行，比如2,4,6
+1-58/2 * * * *        每隔两分钟执行，且是奇数分钟执行，比如3,5,7
+0 0 1,5,10 * *        每个月1号，5号，10号执行
+0 0 1-5 * *            每个月 1到5号执行
+
+ # .---------------- 分钟 (0 - 59)
+ # |  .------------- 小时 (0 - 23)
+ # |  |  .---------- 每月中的哪一天 (1 - 31)
+ # |  |  |  .------- 月 (1 - 12) OR jan,feb,mar,apr ...
+ # |  |  |  |  .---- 星期几 (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+ # |  |  |  |  |
+ # *  *  *  *  *  将要执行的命令
+
+crontab -l 列出所有定时任务 如果要删除一个定时任务
+那么
+crontab -e
+注释掉对应定时任务语句
+例如要删除我刚刚定义的那个定时任务
+#every minute echo char to file
+1-59 * * * * echo `date`” oracle” >> /opt/shuju/tj.txt
+只需要
+#every minute echo char to file
+#1-59 * * * * echo `date`” oracle” >> /opt/shuju/tj.txt
+如果用crontab -r
+就删除拉所有的定时任务(需要特别小心)
+
+
+[root@com ~]# chkconfig --list|grep  iptables
+iptables        0:off   1:off   2:on    3:on    4:on    5:on    6:off
+[root@com ~]# chkconfig iptables off
+[root@com ~]# chkconfig --list|grep  iptables     
+iptables        0:off   1:off   2:off   3:off   4:off   5:off   6:off
+chkconfig iptables off  执行后linux重启后不会在启动防火墙
+
+
+vi  /etc/sysconfig/network  编辑主机名
+设置ssh免密码登录 执行命令：
+（1）ssh -keygen -t rsa
+（2）cd /root/.ssh/     cp id_rsa.pub authorized_keys
+ssh localhost
+ ssh com.ctl.work
+
+
+如何解压cpio.gz文件
+
+解压文件
+第一种方法：
+zcat  lnx_920_disk1.cpio.gz | cpio -idmv
+zcat  lnx_920_disk1.cpio.gz | cpio -idmv
+zcat  lnx_920_disk1.cpio.gz | cpio -idmv
+第二种方法 ：
+第一步：
+gunzip lnx_920_disk1.cpio.gz
+gunzip lnx_920_disk2.cpio.gz
+gunzip lnx_920_disk3.cpio.gz
+第二步：
+cpio -idmv
+第三种
+#gunzip 文件名.cpio.gz
+　　这样文件就解压成为 "文件名.cpio" 了，然后再对它进行cpio操作
+　　#cpio -idmv
+[url=http://blog.csdn.net/limingxi007/archive/2008/11/06/3239507.aspx][/url]
+
+
+
+ 
+
+# vi /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=yourname //在这修改hostname
+NISDOMAIN=eng-cn.platform.com
+
+2.修改/etc/hosts里面的名字
+＃ vi /etc/hosts
+127.0.0.1 localhost.localdomain localhost
+172.17.33.169 yourname //在这修改hostname
+
+3.最后在终端下执行：
+＃hostname ***** //*****为修改的hostname
+
+hostname命令只是临时改变主机名，重启后主机名还是恢复成原来的。要想永久更改主机名，需要修改/etc/sysconfig/network 文件。
+
+今天发现一个问题，由于个人习惯问题，装系统的时候并没有设置好LINUX的主机名，而是习惯用
+# hostname （主机名）
+进行设置，当重新登录到系统的时候，设置的主机名就生效，由于服务器长期开着，也不太重启，所以一直没有注意当重启机器后，使用hostname 设置的主机名并不记录到系统文件中。
+
+查看主机名命令
+# uname -n
+qmail.hzhyzg.com
+
+配置文件
+# cat /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=localhost.localdomain
+
+将HOSTNAME改成设置的主机名，永远生效
+
+linux下修改主机名
+
+修改主机名：
+1./etc/sysconfig/network
+内容：
+networking=yes
+hostname=lh //主机名(没有这行？那就添加这一行吧)
+gateway=192.168.1.1
+2.运行命令：
+#hostname lh
+//lh为主机名
+3./etc/hosts
+内容：
+# do not remove the following line, or various programs
+# that require network functionality will fail.
+127.0.0.1 localhost localhost.localdomain localhost
+把第二localhost写为lh，即：
+127.0.0.1 lh localhost.localdomain localhost
+但是步骤3不是必须的。如果这三个步骤都做了，无论是否重起，
+主机名都将修改成功
+在linux 系统中，默认的主机名是loalhost，如果想修改自己的主机名，可以使用命令：hostname xxx。不过如果你正在使用x window窗口，用这个命令修改了主机名之后就打不开xterm了。所以，彻底一点的办法是直接修改/etc/network文件：hostname= xxx，然后重启计算机，主机名已经被修改了。
+使用dhcp的系统就不能用上述方法了，因为启动network时主机名会被改成dhcp服务器提供的名称。怎么办呢？既然主机名被粗暴的修改了，那咱们也粗暴的改回来：编辑/etc/rc，在最后加上一行hostname xxx，重启系统就ok了。。
+下面是修改服务器的IP地址：
+修改IP可用 netconfig 或 ifconfig eth0 192.168.1.1 255.255.255.0 ＃不保存 ip add dev eth0 192.168.1.1/24 ＃不保存或 vi /etc/sysconfig/network-scripts/ifcfg-eth0
+service network restart ＃重启服务
+
+
+
+grep多个关键字“与”和“或”(2011-01-12 16:17:01)转载▼标签： grepawkegrepit 分类： Coding  
+1、或操作
+  grep -E '123|abc' filename  // 找出文件（filename）中包含123或者包含abc的行
+  egrep '123|abc' filename    // 用egrep同样可以实现
+  awk '/123|abc/' filename   // awk 的实现方式 
+2、与操作
+  grep pattern1 files | grep pattern2 ：显示既匹配 pattern1 又匹配 pattern2 的行。
+3、其他操作
+grep -i pattern files ：不区分大小写地搜索。默认情况区分大小写，
+grep -l pattern files ：只列出匹配的文件名，
+grep -L pattern files ：列出不匹配的文件名，
+grep -w pattern files ：只匹配整个单词，而不是字符串的一部分（如匹配‘magic’，而不是‘magical’），
+grep -C number pattern files ：匹配的上下文分别显示[number]行，
+
+
+想要在linux系统运行java  swing 程序
+1、export DISPLAY=192.168.42.19:0   #192.168.42.19 本机ip
+2、打开xshell的 Xmanager.exe
+3、运行java swing程序
+ssh-keygen -t rsa 一直回车然后在~/.ssh/目录下面执行touch  touch authorized_keys  
+cat id_rsa.pub >> authorized_keys 
+ssh-copy-id  -i  hostname --ssh免密码登录
+ssh -p 9210  root@103.235.230.213 
+linux时间同步
+service ntp start
+客户端： ntpdate -d  服务器ip(ntpdate -d  ctl19)     210.72.145.44  (国家授时中心服务器IP地址)
+出现错误1.Server dropped: Strata too high
+在ntp客户端运行ntpdate serverIP，出现no server suitable for synchronization found的错误。
+在ntp客户端用ntpdate –d serverIP查看，发现有“Server dropped: strata too high”的错误，并且显示“stratum 16”。而正常情况下stratum这个值得范围是“0~15”。
+这是因为NTP server还没有和其自身或者它的server同步上。
+以下的定义是让NTP Server和其自身保持同步，如果在/ntp.conf中定义的server都不可用时，将使用local时间作为ntp服务提供给ntp客户端。
+server 127.127.1.0（/ect/ntp.conf）
+fudge 127.127.1.0 stratum 8 （/ect/ntp.conf）
+2.2.2. 编辑ntp配置文件
+# nano /etc/ntp.conf
+最简单的配置就是修改一条信息，具体如下：
+restrict 192.168.0.0 mask 255.255.0.0 nomodify notrap
+2.3.2 上面的命令只是客户端与时间服务器的一次同步，若想周期性的进行时间同步，那我们就要添加计划任务了
+# crontab -e
+在最后一行添加如下内容： 
+0 1 * * * /usr/sbin/ntpdate 192.168.42.19
+每天凌晨1：00进行时间同步
+tail -f /var/log/cron   查看crontab定时任务是否执行
+
+
+
+
+eth0      Link encap:Ethernet  HWaddr 08:00:27:BC:D3:10  
+          inet addr:192.168.42.19  Bcast:192.168.42.255  Mask:255.255.255.0
+
+eth0      Link encap:Ethernet  HWaddr 08:00:27:DD:C8:64  
+          inet addr:192.168.42.20  Bcast:192.168.42.255  Mask:255.255.255.0
+
+eth0      Link encap:Ethernet  HWaddr 08:00:27:4F:6E:A3  
+          inet addr:192.168.42.21  Bcast:192.168.42.255  Mask:255.255.255.0
+
+eth0      Link encap:Ethernet  HWaddr 08:00:27:1A:0F:B2  
+          inet addr:192.168.42.23  Bcast:192.168.42.255  Mask:255.255.255.0
+
+
+
+
+
+
+
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+	<bean id="sellter" class="com.ctl.proxy.advice.before.NativeSellter" />
+	<bean id="waiter" class="com.ctl.proxy.advice.before.NativeWaiter" />
+	
+	<bean id="waiterAdvice" class="com.ctl.proxy.advice.before.GreetingBeforeWaiter"/>
+	
+	
+	<!-- 自动创建代理 -->
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator"
+	p:beanNames="*er,*et"
+	p:interceptorNames="waiterAdvice"
+	p:optimize="true"
+	/>
+	<!-- 将advice自动织入到目标bean中  -->
+	<bean id="regexAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor"
+	p:patterns=".*greet.*"
+	p:advice-ref="waiterAdvice"/>
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+</beans>

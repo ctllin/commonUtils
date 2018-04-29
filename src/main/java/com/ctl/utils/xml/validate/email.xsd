@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/email" xmlns:tns="http://www.example.org/email" elementFormDefault="qualified">
+	<element name="email">
+		<complexType>
+			<sequence>
+				<element name="from" type="string"/>
+				<element name="to" type="string"/>
+				<element name="subject" type="string"/>
+				<element name="body" type="string"/>
+				<element name="student">
+				   	<complexType>
+		        	<sequence>
+		       				<element name="id" type="string"/>
+							<element name="name" type="string"/>
+		       	  </sequence>
+		       	</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

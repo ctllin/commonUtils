@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="logPrefix" value="imp."/>
+        <!-- <setting name="logImpl" value="SLF4J"/> -->
+    </settings>
+    <typeAliases>
+    </typeAliases>
+    <plugins>
+        <!--
+        分页查询插件 在mapper里面需要配置
+         <if test="whereStr != null" >
+           and ${whereStr}
+        </if>
+        mapper查询参数如下 PageBounds传入的是分页参数
+        mapper.selectByParams(dataMap,new PageBounds(2,10))
+         -->
+        <plugin interceptor="com.github.miemiedev.mybatis.paginator.OffsetLimitInterceptor">
+            <property name="dialectClass" value="com.github.miemiedev.mybatis.paginator.dialect.MySQLDialect"/>
+        </plugin>
+    </plugins>
+</configuration>

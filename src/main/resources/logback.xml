@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2010-2011 The myBatis Team
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<configuration debug="false" scan="true" scanPeriod="60 seconds">
+    <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->  
+	<!--     
+		<property name="LOG_HOME" value="${catalina.base}/logs" />  
+	 -->    
+    <property name="LOG_HOME" value="/home/logs" />
+    <!-- 控制台输出 -->   
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+             <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+            <!-- <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern> -->
+             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{50}-%msg%n</pattern>   
+            <immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">utf-8</charset>
+        </encoder> 
+    </appender>
+    <!-- 按照每天生成日志文件 -->   
+    <appender name="FILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/commonutils.%d{yyyyMMdd}.log</FileNamePattern> 
+            <!--日志文件保留天数-->
+            <MaxHistory>60</MaxHistory>
+        </rollingPolicy>   
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符--> 
+           <!--  <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>    -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{50}-%msg%n</pattern>   
+            <immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">utf-8</charset>  
+        </encoder> 
+        <!--日志文件最大的大小   不生效 日期和大小不同时生效   不注释 会造成无法切日，切文件到了指定大小无任何反映  -->
+      <!--  <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+         <MaxFileSize>2KB</MaxFileSize>
+       </triggeringPolicy> -->
+    </appender> 
+    
+    
+    <!-- 代扣日志 -->
+    <!--  <appender name="portalpay"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            日志文件输出的文件名
+            <FileNamePattern>${LOG_HOME}/portalpay.%d{yyyyMMdd}.log</FileNamePattern> 
+            日志文件保留天数
+            <MaxHistory>60</MaxHistory>
+        </rollingPolicy>   
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n</pattern>   
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{50}-%msg%n</pattern>   
+            <immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>  
+        </encoder> 
+        日志文件最大的大小   不生效 日期和大小不同时生效   不注释 会造成无法切日，切文件到了指定大小无任何反映 
+       <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+         <MaxFileSize>2KB</MaxFileSize>
+       </triggeringPolicy>
+    </appender> 
+    
+     <logger name="com.xilehang.portalpay.controller.PortalPayController" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+		<appender-ref ref="portalpay" />
+	 </logger> -->
+    
+    
+   <!--  <appender name="AlipayController"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            日志文件输出的文件名
+            <FileNamePattern>${LOG_HOME}/AlipayController.%d{yyyy-MM-dd}.log</FileNamePattern> 
+            日志文件保留天数
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>   
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>   
+            <immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>  
+        </encoder> 
+        日志文件最大的大小
+       <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+         <MaxFileSize>10MB</MaxFileSize>
+       </triggeringPolicy>
+    </appender> 
+    
+    <appender name="AlipayControllerLog"  class="ch.qos.logback.core.rolling.RollingFileAppender">   
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            日志文件输出的文件名
+            <FileNamePattern>${LOG_HOME}/AlipayControllerLog.%d{yyyy-MM-dd}.log</FileNamePattern> 
+            日志文件保留天数
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>   
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"> 
+            格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>   
+            <immediateFlush>true</immediateFlush>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>  
+        </encoder> 
+        日志文件最大的大小
+       <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+         <MaxFileSize>10MB</MaxFileSize>
+       </triggeringPolicy>
+    </appender>  -->
+   <!--  <logger name="com.xilehang.alipay.controller.AlipayController" level="TRACE" additivity="false">
+        <appender-ref ref="STDOUT" />
+		<appender-ref ref="AlipayController" />
+	</logger>
+    <logger name="com.xilehang.common.log.AlipayControllerLog" level="TRACE" additivity="false">
+		<appender-ref ref="AlipayControllerLog" />
+	</logger> -->
+    
+    
+   <!-- show parameters for hibernate sql 专为 Hibernate 定制 --> 
+  <!--   <logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />  
+    <logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="DEBUG" />  
+    <logger name="org.hibernate.SQL" level="DEBUG" />  
+    <logger name="org.hibernate.engine.QueryParameters" level="DEBUG" />
+    <logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" />   -->
+    
+    <!--myibatis log configure--> 
+  <!--   <logger name="com.apache.ibatis" level="DEBUG"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+    
+    
+    <logger name="com.ibatis" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />
+    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" /> -->
+    <logger name="com.ibatis" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />
+    <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />
+    <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" /> 
+    <logger name="dao" level="DEBUG"/>
+	<logger name="java.sql.Connection" level="DEBUG" />
+	<logger name="java.sql.Statement" level="DEBUG" />
+	<logger name="java.sql.PreparedStatement" level="DEBUG" />
+    <!-- 日志输出级别 -->
+    <root level="debug">
+     
+
+      <appender-ref ref="STDOUT" />
+      
+        <!--
+         <appender-ref ref="FILE" />
+        <appender-ref ref="DB" />
+         -->
+    </root> 
+     <!--日志异步到数据库 -->  
+   <!--  <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+        日志异步到数据库 
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+           连接池 
+           <dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">
+              <driverClass>com.mysql.jdbc.Driver</driverClass>
+              <url>jdbc:mysql://127.0.0.1:3306/test</url>
+              <user>root</user>
+              <password>root</password>
+            </dataSource>
+        </connectionSource>
+  </appender> -->
+</configuration>

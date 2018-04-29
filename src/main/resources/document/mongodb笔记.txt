@@ -1,0 +1,37 @@
+下载地址: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-linux/
+curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.6.3.tgz
+数据库启动命令 mongod --dbpath=/home/soft/mongodb-linux-x86_64-3.6.3/db(db是存放数据的文件夹，自己创建)
+/home/soft/mongodb-linux-x86_64-3.6.3
+
+配置 MongoDB 服务
+管理员模式打开命令行窗口
+创建目录，执行下面的语句来创建数据库和日志文件的目录
+mkdir c:\data\db
+mkdir c:\data\log
+
+创建配置文件
+创建一个配置文件。该文件必须设置 systemLog.path 参数，包括一些附加的配置选项更好。
+例如，创建一个配置文件位于 C:\mongodb\mongod.cfg，其中指定 systemLog.path 和 storage.dbPath。具体配置内容如
+systemLog:
+    destination: file
+    path: /home/soft/mongodb-linux-x86_64-3.6.3/logs/mongod.log
+storage:
+    dbPath: /home/soft/mongodb-linux-x86_64-3.6.3/db
+
+linux启动
+ mongod --dbpath=/home/soft/mongodb-linux-x86_64-3.6.3/db 
+MongoDB后台管理 Shell
+$ cd /usr/local/mongodb/bin
+$ ./mongo
+
+show dbs/use dbname/show talbes
+db.test2.insert({"site":"www.runoob.com","name":"菜鸟教程","num":5})
+db.test2.find()
+
+
+使用用户 admin 使用密码 123456 连接到本地的 MongoDB 服务上。输出结果如下所示：
+mongodb://admin:123456@localhost/
+使用用户名和密码连接登陆到指定数据库，格式如下：
+mongodb://admin:123456@localhost/test
+
+https://github.com/nosqlclient/nosqlclient

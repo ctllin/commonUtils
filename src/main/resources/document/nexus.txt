@@ -1,0 +1,48 @@
+下载地址:
+	https://www.sonatype.com/nexus-repository-oss
+	https://www.sonatype.com/download-oss-sonatype
+配置文件地址：
+	/etc/nexus.properties
+启动服务：
+	bin/nexus
+开放端口 8081
+	firewall-cmd --get-active-zones 
+	firewall-cmd --zone=FedoraServer --add-port=8081/tcp --permanent
+	firewall-cmd --reload
+	firewall-cmd --list-ports 
+访问地址:
+	http://192.168.42.29:8081/
+	其中admin具有全部权限默认密码admin123；anonymous作为匿名用户，只具有查看权限。 
+安装到本地库：
+	mvn clean/mvn compile/mvn package
+	mvn install:install-file -DgroupId=com.ctl -DartifactId=commonUtils -Dversion=1.0.1 -Dpackaging=jar -Dfile=/home/jars/commonUtils.jar
+安装到私服 :
+	mvn deploy:deploy-file -DgroupId=org.apache.hadoop -DartifactId=hbase -Dversion=1.0 -Dpackaging=jar -Dfile=[path to file] -Durl=[url] -DrepositoryId=[id]
+	mvn deploy:deploy-file -DgroupId=com.ctl -DartifactId=commonUtils -Dversion=1.0.2 -Dpackaging=jar -Dfile=target/commonUtils.jar -Durl=http://192.168.42.29:8081/repository/maven-releases/  -DrepositoryId=nexus-release
+        或者mvn deploy -e  (这里面版本控制在pom.xml中控制如下：打出的版本是1.1)
+        <groupId>com.ctl.utils</groupId>
+       <artifactId>commonUtils</artifactId>
+       <version>1.1</version>
+       <packaging>jar</packaging>
+	Repository does not allow updating assets 解决方法
+	浏览器登录nexus管理界面–>设置图标–>Repository–>Repositories–>maven-releases–>Hosted–>请选择‘Allow redeploy’策略，默认是disable策略，然后保存。 请注意，不同版本的nexus，进入的路径可能有细微区别
+
+
+maven conf settings.xml中有如下配置
+ <servers>
+		<server> <!-- add by ctl for nexus -->
+			<id>nexus-release</id>
+			<username>admin</username>
+			<password>admin123</password>
+		</server>
+		<server> <!-- add by ctl for nexus -->
+			<id>nexus-snapshots</id>
+			<username>admin</username>
+			<password>admin123</password>
+		</server>
+		<server>
+			<id>apacheserver</id>
+			<username>root</username>
+			<password>ctllin</password>
+		</server>
+</servers>
