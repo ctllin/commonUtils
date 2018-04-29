@@ -32,22 +32,70 @@
             <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
             <property name="suppressAllComments" value="false" />
         </commentGenerator>
+
         <!-- jdbc:mysql://192.168.42.29:3306/test?useUnicode=true&amp;characterEncoding=utf-8 -->
         <jdbcConnection driverClass="${mysql.driver}"
                         connectionURL="${mysql.url}"
                         userId="${mysql.username}" password="${mysql.password}" />
+
+        <!-- 类型转换 -->
+        <javaTypeResolver>
+            <!-- 是否使用bigDecimal， false可自动转化以下类型（Long, Integer, Short, etc.） -->
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
         <!--实体生成路径 -->
-        <javaModelGenerator targetPackage="com.ctl.test.model"
-                            targetProject="src/main/java" >
+        <javaModelGenerator targetPackage="com.ctl.test.model"  targetProject="src/main/java" >
             <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
             <!--<property name="enableSubPackages" value="true"/>-->
+            <!-- 是否在当前路径下新加一层schema,eg：fase路径com.oop.eksp.user.model， true:com.oop.eksp.user.model.[schemaName] -->
+            <property name="enableSubPackages" value="false"/>
+            <!-- 是否针对string类型的字段在set的时候进行trim调用 -->
+            <property name="trimStrings" value="true"/>
         </javaModelGenerator>
         <!--mapper文件生成路径 -->
-        <sqlMapGenerator targetPackage="com.ctl.test.mappers"
-                         targetProject="src/main/resources" />
+        <sqlMapGenerator targetPackage="com.ctl.test.mappers"  targetProject="src/main/java" />
         <!--dao层生成路径 -->
         <javaClientGenerator targetPackage="com.ctl.test.mappers"  targetProject="src/main/java" type="XMLMAPPER" />
         <table schema="test" tableName="person" />
+        <!-- 配置表信息
+          catalog CDATA #IMPLIED
+          schema CDATA #IMPLIED
+          tableName CDATA #REQUIRED
+          alias CDATA #IMPLIED
+          domainObjectName CDATA #IMPLIED
+          mapperName CDATA #IMPLIED
+          sqlProviderName CDATA #IMPLIED
+          enableInsert CDATA #IMPLIED
+          enableSelectByPrimaryKey CDATA #IMPLIED
+          enableSelectByExample CDATA #IMPLIED
+          enableUpdateByPrimaryKey CDATA #IMPLIED
+          enableDeleteByPrimaryKey CDATA #IMPLIED
+          enableDeleteByExample CDATA #IMPLIED
+          enableCountByExample CDATA #IMPLIED
+          enableUpdateByExample CDATA #IMPLIED
+          selectByPrimaryKeyQueryId CDATA #IMPLIED
+          selectByExampleQueryId CDATA #IMPLIED
+          modelType CDATA #IMPLIED
+          escapeWildcards CDATA #IMPLIED
+          delimitIdentifiers CDATA #IMPLIED
+          delimitAllColumns CDATA #IMPLIED>
+         -->
+        <table schema="test" tableName="people"
+               domainObjectName="PeopleEntity" mapperName="PeopleServiceMapper" enableCountByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               enableUpdateByExample="false" selectByPrimaryKeyQueryId="true" enableSelectByPrimaryKey="true" enableUpdateByPrimaryKey="true"  enableDeleteByPrimaryKey="true" >
+            <!-- schema即为数据库名 tableName为对应的数据库表 domainObjectName是要生成的实体类 enable*ByExample
+                是否生成 example类   -->
+
+            <!-- 忽略列，不生成bean 字段 -->
+            <ignoreColumn column="updatetime" />
+            <!-- 指定列的java数据类型 -->
+            <columnOverride column="salarylong" jdbcType="VARCHAR" />
+        </table>
+
+
+
     </context>
 </generatorConfiguration>
 
