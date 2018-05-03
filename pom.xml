@@ -69,6 +69,8 @@
         <mybatis.generator.version>1.3.6</mybatis.generator.version>
         <mysql.version>6.0.6</mysql.version><!-- 8.0.8-dmr  6.0.6此版本mybatis无法生成selectByPrimaryKey or deleteByPrimaryKey -->
         <slf4j.api.version>1.7.25</slf4j.api.version>
+        <commons.lang3.version>3.7</commons.lang3.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
     <build>
         <resources>
@@ -189,7 +191,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
+            <version>${commons.lang3.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mybatis.generator/mybatis-generator-core -->
         <dependency>
@@ -239,14 +241,14 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.2.3</version>
+            <version>${logback.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <version>${logback.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.redlink.ext.logback/logback-ext-core -->
         <!-- <dependency>
@@ -258,7 +260,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-access</artifactId>
-            <version>1.2.3</version>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hanshow</groupId>
