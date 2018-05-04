@@ -19,7 +19,7 @@ import java.util.Properties;
  931 Jps
  */
 public class ProducerDemo {
-    public static String serverHost="192.168.42.19:9092";
+    public static String serverHost="192.168.42.29:9092";
     public static void main(String[] args) {
         Properties props = new Properties();
         props.put("bootstrap.servers", serverHost);
