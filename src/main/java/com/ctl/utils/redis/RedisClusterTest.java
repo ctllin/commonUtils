@@ -4,10 +4,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.*;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -26,14 +23,32 @@ import java.util.UUID;
  */
 public class RedisClusterTest {
     public static void main(String[] args) {
+
+//        Config config = new Config();
+//        config.useClusterServers()
+//                .setScanInterval(5000) // cluster state scan interval in milliseconds
+//                .addNodeAddress("192.168.42.3:6379")
+//                .addNodeAddress("192.168.42.3:6380")
+//                .addNodeAddress("192.168.42.3:6381")
+//                .addNodeAddress("192.168.42.3:6382")
+//                .addNodeAddress("192.168.42.3:6383")
+//                .addNodeAddress("192.168.42.3:6384");
+//        RedissonClient redisson = Redisson.create(config);
+//        System.out.println(redisson.getKeys());
+
+
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         // 最大连接数
-        poolConfig.setMaxTotal(1);
+        poolConfig.setMaxTotal(60000);
         // 最大空闲数
-        poolConfig.setMaxIdle(1);
+        poolConfig.setMaxIdle(1000);
         // 最大允许等待时间，如果超过这个时间还未获取到连接，则会报JedisException异常：
         // Could not get a resource from the pool
-        poolConfig.setMaxWaitMillis(1000);
+        poolConfig.setMaxWaitMillis(3000);
+
+        poolConfig.setTestOnBorrow(true);
+
+
         Set<HostAndPort> nodes = new LinkedHashSet<>();
         nodes.add(new HostAndPort("192.168.42.3", 6379));
         nodes.add(new HostAndPort("192.168.42.3", 6380));
@@ -41,6 +56,9 @@ public class RedisClusterTest {
         nodes.add(new HostAndPort("192.168.42.3", 6382));
         nodes.add(new HostAndPort("192.168.42.3", 6383));
         nodes.add(new HostAndPort("192.168.42.3", 6384));
+
+//        JedisPool pool = new JedisPool(poolConfig, "192.168.42.3",6379, 100000);
+//        System.out.println(pool.getResource().get("uuid"));
         JedisCluster cluster = new JedisCluster(nodes, poolConfig);
         cluster.set("uuid", UUID.randomUUID().toString());
         String uuid = cluster.get("uuid");
@@ -49,7 +67,7 @@ public class RedisClusterTest {
         System.out.println(cluster.get("age"));
         try {
             cluster.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
