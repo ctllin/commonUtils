@@ -12,6 +12,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * <p>Title: RedisClusterTest</p>
@@ -41,9 +42,9 @@ public class RedisClusterTest {
         nodes.add(new HostAndPort("192.168.42.3", 6383));
         nodes.add(new HostAndPort("192.168.42.3", 6384));
         JedisCluster cluster = new JedisCluster(nodes, poolConfig);
-        cluster.set("name", "ctl");
-        String name = cluster.get("name");
-        System.out.println(name);
+        cluster.set("uuid", UUID.randomUUID().toString());
+        String uuid = cluster.get("uuid");
+        System.out.println(uuid);
         cluster.set("age", "18");
         System.out.println(cluster.get("age"));
         try {
