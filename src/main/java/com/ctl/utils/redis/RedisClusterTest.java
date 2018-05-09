@@ -64,7 +64,7 @@ public class RedisClusterTest {
         try {
             cluster.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("close cluster fail",e);
         }
     }
 }
