@@ -1,17 +1,13 @@
 package com.ctl.utils.redis;
 
-import com.ctl.utils.DateUtil;
-import org.redisson.Redisson;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import redis.clients.jedis.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * <p>Title: RedisClusterTest</p>
@@ -24,21 +20,8 @@ import java.util.UUID;
  * @date 2018-05-08 14:46
  */
 public class RedisClusterTest {
+    public static Logger logger = LoggerFactory.getLogger(RedisClusterTest.class);
     public static void main(String[] args) {
-
-//        Config config = new Config();
-//        config.useClusterServers()
-//                .setScanInterval(5000) // cluster state scan interval in milliseconds
-//                .addNodeAddress("192.168.42.3:6379")
-//                .addNodeAddress("192.168.42.3:6380")
-//                .addNodeAddress("192.168.42.3:6381")
-//                .addNodeAddress("192.168.42.3:6382")
-//                .addNodeAddress("192.168.42.3:6383")
-//                .addNodeAddress("192.168.42.3:6384");
-//        RedissonClient redisson = Redisson.create(config);
-//        System.out.println(redisson.getKeys());
-
-
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         // 最大连接数
         poolConfig.setMaxTotal(60000);
@@ -47,10 +30,7 @@ public class RedisClusterTest {
         // 最大允许等待时间，如果超过这个时间还未获取到连接，则会报JedisException异常：
         // Could not get a resource from the pool
         poolConfig.setMaxWaitMillis(5000);
-
         poolConfig.setTestOnBorrow(true);
-
-
         Set<HostAndPort> nodes = new LinkedHashSet<>();
         //加入前面三个为master后面三个为从属当关闭前三个后 后三个会自动变master 然后从后三个获取数据
         nodes.add(new HostAndPort("192.168.42.3", 6379));//master
@@ -59,7 +39,7 @@ public class RedisClusterTest {
         nodes.add(new HostAndPort("192.168.42.3", 6382));
         nodes.add(new HostAndPort("192.168.42.3", 6383));
         nodes.add(new HostAndPort("192.168.42.3", 6384));
-        //另一个集群在192.168.42.29 存放了a100  当两个集群都加载在nodes中时只有最先加入的生效
+//        另一个集群在192.168.42.29 存放了a100  当两个集群都加载在nodes中时只有最先加入的生效
 //        nodes.add(new HostAndPort("192.168.42.29", 6379));
 //        nodes.add(new HostAndPort("192.168.42.29", 6380));
 //        nodes.add(new HostAndPort("192.168.42.29", 6381));
@@ -72,14 +52,14 @@ public class RedisClusterTest {
         //cluster.set("uuid", UUID.randomUUID().toString());
         String uuid = cluster.get("uuid");
         System.out.println(uuid);
-      //  cluster.set("age", "18");
+        //  cluster.set("age", "18");
         System.out.println(cluster.get("age"));
 
-        for(int i=0;i<100;i++){
-             //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
+        for (int i = 0; i < 100; i++) {
+            //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
         }
-        for(int i=0;i<101;i++){
-            System.out.println(cluster.get("a"+i));
+        for (int i = 0; i < 100; i++) {
+            System.out.println(cluster.get("a" + i));
         }
         try {
             cluster.close();
