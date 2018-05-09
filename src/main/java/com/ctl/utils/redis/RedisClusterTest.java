@@ -59,7 +59,13 @@ public class RedisClusterTest {
         nodes.add(new HostAndPort("192.168.42.3", 6382));
         nodes.add(new HostAndPort("192.168.42.3", 6383));
         nodes.add(new HostAndPort("192.168.42.3", 6384));
-
+        //另一个集群在192.168.42.29 存放了a100  当两个集群都加载在nodes中时只有最先加入的生效
+//        nodes.add(new HostAndPort("192.168.42.29", 6379));
+//        nodes.add(new HostAndPort("192.168.42.29", 6380));
+//        nodes.add(new HostAndPort("192.168.42.29", 6381));
+//        nodes.add(new HostAndPort("192.168.42.29", 6382));
+//        nodes.add(new HostAndPort("192.168.42.29", 6383));
+//        nodes.add(new HostAndPort("192.168.42.29", 6384));
 //        JedisPool pool = new JedisPool(poolConfig, "192.168.42.3",6379, 100000);
 //        System.out.println(pool.getResource().get("uuid"));
         JedisCluster cluster = new JedisCluster(nodes, poolConfig);
@@ -72,7 +78,7 @@ public class RedisClusterTest {
         for(int i=0;i<100;i++){
              //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
         }
-        for(int i=0;i<100;i++){
+        for(int i=0;i<101;i++){
             System.out.println(cluster.get("a"+i));
         }
         try {
