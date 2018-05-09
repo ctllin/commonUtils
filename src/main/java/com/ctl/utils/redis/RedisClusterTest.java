@@ -56,7 +56,6 @@ public class RedisClusterTest {
         nodes.add(new HostAndPort("192.168.42.3", 6379));//master
         nodes.add(new HostAndPort("192.168.42.3", 6380));//master
         nodes.add(new HostAndPort("192.168.42.3", 6381));//master
-
         nodes.add(new HostAndPort("192.168.42.3", 6382));
         nodes.add(new HostAndPort("192.168.42.3", 6383));
         nodes.add(new HostAndPort("192.168.42.3", 6384));
@@ -64,14 +63,14 @@ public class RedisClusterTest {
 //        JedisPool pool = new JedisPool(poolConfig, "192.168.42.3",6379, 100000);
 //        System.out.println(pool.getResource().get("uuid"));
         JedisCluster cluster = new JedisCluster(nodes, poolConfig);
-      //  cluster.set("uuid", UUID.randomUUID().toString());
+        //cluster.set("uuid", UUID.randomUUID().toString());
         String uuid = cluster.get("uuid");
         System.out.println(uuid);
       //  cluster.set("age", "18");
         System.out.println(cluster.get("age"));
-        System.out.println(cluster.get("name"));
+
         for(int i=0;i<100;i++){
-            //cluster.set("a"+i, i+"\t"+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
+            //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
         }
         for(int i=0;i<100;i++){
             System.out.println(cluster.get("a"+i));
