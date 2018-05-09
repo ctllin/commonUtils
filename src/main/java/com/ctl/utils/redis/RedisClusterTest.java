@@ -70,7 +70,7 @@ public class RedisClusterTest {
         System.out.println(cluster.get("age"));
 
         for(int i=0;i<100;i++){
-            //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
+             //cluster.set("a"+i, i+"    "+DateUtil.sdfyyyy_MM_dd_HH_mm_ss.format(new Date()));
         }
         for(int i=0;i<100;i++){
             System.out.println(cluster.get("a"+i));
