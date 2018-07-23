@@ -5,7 +5,7 @@ public class MongoDbDemo1 {
     public static void main( String args[] ){
         try{
             // 连接到 mongodb 服务
-            MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
+            MongoClient mongoClient = new MongoClient( "192.168.42.29" , 27017 );
 
             // 连接到数据库
             MongoDatabase mongoDatabase = mongoClient.getDatabase("mycol");
