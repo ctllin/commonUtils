@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,11 @@ import java.util.UUID;
  */
 public class RedisUtil {
     static Logger logger = LoggerFactory.getLogger(RedisUtil.class);
-    private static Jedis jedis=redisInstances();
+    //private static Jedis jedis=redisInstances();
     private static JedisPool pool = null;
     private static Map<String, String> setDataMap = new HashMap<>();
     /**
-     * 构建redis连接池
+     * 构建redis连接池 使用过得redis连接直接调用close方法关闭(使用后必须关闭不可以使用pool.returnResource(redis))
      * @return JedisPool
      */
     public static JedisPool getPool() {
@@ -55,80 +54,141 @@ public class RedisUtil {
             return null;
         }
     }
+
     /**
      * 获取redis链接
      * @return
      */
-    private static Jedis redisInstances(){
-        if (jedis != null) {
-            return jedis;
-        } else {
-            try {
-                Jedis jedis = new Jedis(ConfigUtils.getType("redis.host"), Integer.parseInt(ConfigUtils.getType("redis.port")));
-                jedis.auth(ConfigUtils.getType("redis.auth"));
-                return jedis;
-            } catch (Exception e) {
-                logger.error("获取redis链接失败", e);
-                return null;
-            }
-        }
-    }
+//    private static Jedis redisInstances(){
+//        if (jedis != null) {
+//            return jedis;
+//        } else {
+//            try {
+//                Jedis jedis = new Jedis(ConfigUtils.getType("redis.host"), Integer.parseInt(ConfigUtils.getType("redis.port")));
+//                jedis.auth(ConfigUtils.getType("redis.auth"));
+//                return jedis;
+//            } catch (Exception e) {
+//                logger.error("获取redis链接失败", e);
+//                return null;
+//            }
+//        }
+//    }
 
     /**
      * 关闭redis连接
      * @return
      */
-    public static boolean close(){
-        try {
-            if (jedis != null) {
-                jedis.close();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            logger.error("关闭redis链接失败", e);
-            return false;
-        }
-    }
+//    public static boolean close(){
+//        try {
+//            if (jedis != null) {
+//                jedis.close();
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            logger.error("关闭redis链接失败", e);
+//            return false;
+//        }
+//    }
     static { //初始化redis获取redis对象
-        redisInstances();
+        //redisInstances();
     }
 
     /**
      * 根据会员id和商户id获取securityKey
-     * @param memberId
      * @param merchantId
+     * @param memberId
      * @return
      */
-    public static String getSecurityKey(String memberId, String merchantId){
+    public static String getSecurityKey(String merchantId, String memberId) {
+        Jedis redis = null;
         try {
-            List<String> mget = jedis.hmget("member-securityKey", memberId + "-" + merchantId);
-            if(mget!=null && mget.size()>=1){
+            redis = getPool().getResource();
+            List<String> mget = redis.hmget("member-securityKey", merchantId + "-" + memberId);
+            if (mget != null && mget.size() >= 1) {
                 return mget.get(0);
-            }else{
+            } else {
                 return null;
             }
         } catch (Exception e) {
-            logger.error("获取securityKey失败",e);
+            logger.error("获取securityKey失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+    /**
+     * 根据appid和商户id获取sessionKey
+     * @param merchantId
+     * @param appid
+     * @param openid
+     * @return
+     */
+    public static String getSessionKey(String merchantId, String appid, String openid) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            List<String> mget = redis.hmget("member-sessionKey", merchantId + "-" + appid + "-" + openid);
+            if (mget != null && mget.size() >= 1) {
+                return mget.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("获取sessionKey失败",e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据商户id和appid获取appsecret
+     * @param merchantId
+     * @param appid
+     * @return
+     */
+    public static String getSmallAppsecret(String merchantId, String appid) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            List<String> mget = redis.hmget("member-appsecret", merchantId.trim() + "-" + appid.trim());
+            if (mget != null && mget.size() >= 1) {
+                return mget.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("获取appsecret失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
     /**
      * 根据会员id和商户id增加securityKey
-     * @param memberId
      * @param merchantId
+     * @param memberId
      * @return
      */
-    public static String addSecurityKey(String memberId, String merchantId){
+    public static String addSecurityKey(String merchantId, String memberId) {
+        Jedis redis = null;
         try {
+            redis = getPool().getResource();
             //先获取如果存在直接返回,否则生成
-            String securityKey = getSecurityKey(memberId, merchantId);
+            String securityKey = getSecurityKey(merchantId, memberId);
             if (securityKey == null) {
-                securityKey = UUID.randomUUID().toString().replaceAll("-", "");
-                setDataMap.put(memberId + "-" + merchantId, UUID.randomUUID().toString().replaceAll("-", ""));
-                jedis.hmset("member-securityKey", setDataMap);
+                securityKey = UUID.randomUUID().toString().replaceAll("-","");
+                setDataMap.put(merchantId + "-" + memberId, securityKey);
+                redis.hmset("member-securityKey", setDataMap);
                 setDataMap.clear();
                 return securityKey;
             } else {
@@ -137,28 +197,119 @@ public class RedisUtil {
         } catch (Exception e) {
             logger.error("增加securityKey失败",e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
-
     /**
-     * 根据会员id和商户id刷新securityKey
-     * @param memberId
+     * 根据商户id和appid增加appsecret
      * @param merchantId
+     * @param appid
+     * @param appsecret
      * @return
      */
-    public  static String flushSecurityKey(String memberId, String merchantId){
+    public static String addAppsecret(String merchantId, String appid, String appsecret) {
+        Jedis redis = null;
         try {
-            String securityKey = UUID.randomUUID().toString().replaceAll("-", "");
-            setDataMap.put(memberId + "-" + merchantId, UUID.randomUUID().toString().replaceAll("-", ""));
-            jedis.hmset("member-securityKey", setDataMap);
+            redis = getPool().getResource();
+            if (appsecret != null && !"".equals(appsecret)) {
+                setDataMap.put(merchantId + "-" + appid, appsecret);
+                redis.hmset("member-appsecret", setDataMap);
+                setDataMap.clear();
+                return appsecret;
+            } else {
+                return appsecret;
+            }
+        } catch (Exception e) {
+            logger.error("增加appsecret失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+    /**
+     * 根据appid和商户id增加sessionKey
+     * @param merchantId
+     * @param appid
+     * @param openid
+     * @return
+     */
+    public static String addSessionKey( String merchantId,String appid, String openid, String sessionKey) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            if (sessionKey != null && !"".equals(sessionKey)) {
+                setDataMap.put(merchantId + "-"+appid+"-" + openid, sessionKey);
+                redis.hmset("member-sessionKey", setDataMap);
+                setDataMap.clear();
+                return sessionKey;
+            } else {
+                return sessionKey;
+            }
+        } catch (Exception e) {
+            logger.error("增加sessionKey失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+    /**
+     * 根据会员id和商户id刷新securityKey
+     * @param merchantId
+     * @param memberId
+     * @return
+     */
+    public  static String flushSecurityKey(String merchantId, String memberId){
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            String securityKey = UUID.randomUUID().toString().replaceAll("-","");
+            setDataMap.put(merchantId + "-" + memberId, securityKey);
+            redis.hmset("member-securityKey", setDataMap);
             setDataMap.clear();
             return securityKey;
         } catch (Exception e) {
-            logger.error("刷新securityKey失败",e);
+            logger.error("刷新securityKey失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
-
+    /**
+     * 根据appid和商户id刷新sessionKey
+     * @param appid
+     * @param merchantId
+     * @return
+     */
+    public static String flushSessionKey(String merchantId, String appid, String openid, String sessionKey) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            if (sessionKey != null && !"".equals(sessionKey)) {
+                setDataMap.put(merchantId + "-" + appid + "-" + openid, sessionKey);
+                redis.hmset("member-sessionKey", setDataMap);
+                setDataMap.clear();
+                return sessionKey;
+            } else {
+                return sessionKey;
+            }
+        } catch (Exception e) {
+            logger.error("刷新sessionKey失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
 
     /**
      * 从指定map中获取数据
@@ -167,8 +318,10 @@ public class RedisUtil {
      * @return
      */
     public static String getFromMap(String name, String key) {
+        Jedis redis = null;
         try {
-            List<String> mget = jedis.hmget(name, key);
+            redis = getPool().getResource();
+            List<String> mget = redis.hmget(name, key);
             if (mget != null && mget.size() >= 1) {
                 return mget.get(0);
             } else {
@@ -177,6 +330,10 @@ public class RedisUtil {
         } catch (Exception e) {
             logger.error("从指定map中获取数据失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
@@ -187,12 +344,18 @@ public class RedisUtil {
      * @return
      */
     public static  List<String> getFromMap(String name, String ...key) {
+        Jedis redis = null;
         try {
-            List<String> mget = jedis.hmget(name, key);
+            redis = getPool().getResource();
+            List<String> mget = redis.hmget(name, key);
             return mget;
         } catch (Exception e) {
             logger.error("从指定map中获取数据失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
@@ -204,12 +367,14 @@ public class RedisUtil {
      * @return
      */
     public static String addMapData(String name, String key, String value) {
+        Jedis redis = null;
         try {
+            redis = getPool().getResource();
             //先获取如果存在直接返回,否则生成
             String valueFromRedis = getFromMap(name, key);
             if (valueFromRedis == null) {
                 setDataMap.put(key, value);
-                jedis.hmset(name, setDataMap);
+                redis.hmset(name, setDataMap);
                 setDataMap.clear();
                 return value;
             } else {
@@ -218,6 +383,10 @@ public class RedisUtil {
         } catch (Exception e) {
             logger.error("向指定map中增加数据失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
@@ -228,12 +397,18 @@ public class RedisUtil {
      * @return
      */
     public static boolean addMapData(String name, Map<String, String> dataMap) {
+        Jedis redis = null;
         try {
-            jedis.hmset(name, dataMap);
+            redis = getPool().getResource();
+            redis.hmset(name, dataMap);
             return true;
         } catch (Exception e) {
             logger.error("向指定map中增加数据失败", e);
             return false;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
@@ -247,14 +422,40 @@ public class RedisUtil {
      * @return
      */
     public static String flushMapData(String name, String key, String value) {
+        Jedis redis = null;
         try {
+            redis = getPool().getResource();
             setDataMap.put(key, value);
-            jedis.hmset(name, setDataMap);
+            redis.hmset(name, setDataMap);
             setDataMap.clear();
             return value;
         } catch (Exception e) {
             logger.error(" 更新指定map中数据失败", e);
             return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据map名称获取所有map数据
+     * @param name map名称
+     * @return 有则返回map没有则返回空map
+     */
+    public static Map<String, String> getFromMap(String name) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.hgetAll(name);
+        } catch (Exception e) {
+            logger.error("根据map名称获取所有map数据", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
@@ -265,38 +466,253 @@ public class RedisUtil {
      * @return
      */
     public static boolean flushMapData(String name, Map<String, String> dataMap) {
+        Jedis redis = null;
         try {
-            jedis.hmset(name, dataMap);
+            redis = getPool().getResource();
+            redis.hmset(name, dataMap);
             return true;
         } catch (Exception e) {
             logger.error(" 更新指定map中数据失败", e);
             return false;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
         }
     }
 
+    /**
+     * 设置字符串 保存时间为制定时长
+     * @param key
+     * @param value
+     * @param expire 保存时长单位秒
+     * @return
+     */
+    public static boolean setString(String key,String value,int expire) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            String returnStr = redis.set(key, value);
+            redis.expire(key, expire);
+            return "OK".equals(returnStr) ? true : false;
+        } catch (Exception e) {
+            logger.error("设置字符串失败", e);
+            return false;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
 
+    /**
+     * 设置字符串 一直存在
+     * @param key
+     * @param value
+     * @return
+     */
+    public static boolean setString(String key,String value) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            String returnStr = redis.set(key, value);
+            return "OK".equals(returnStr) ? true : false;
+        } catch (Exception e) {
+            logger.error("设置字符串失败失败", e);
+            return false;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
 
+    /**
+     * 根据key删除字符串
+     * @param key
+     * @return 成功返回1失败返回0异常返回-1(没有该key删除返回0)
+     */
+    public static long delString(String key) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.expire(key, 0);
+        } catch (Exception e) {
+            logger.error("根据key删除字符串失败", e);
+            return -1;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 获取字符串
+     * @param key
+     * @return
+     */
+    public static String getString(String key) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            redis.get(key);
+            return redis.get(key);
+        } catch (Exception e) {
+            logger.error("获取字符串失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 存储list
+     * @param key
+     * @param value 多个value值
+     * @return 返回list集合数量
+     */
+    public static long setList(String key ,String... value){
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            long lset = redis.lpush(key,value);
+            return lset;
+        } catch (Exception e) {
+            logger.error("存储list失败", e);
+            return 0;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据key从集合中获取数据,该数据会从list中删除,最后加入的先pop(删除)
+     * @param key
+     * @return
+     */
+    public static String getFromList(String key) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.lpop(key);
+        } catch (Exception e) {
+            logger.error("根据key从集合中获取数据失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据key获取list长度
+     * @param key
+     * @return 如果list不存在返回0,如果获取出错返回-1
+     */
+    public static long getSizeList(String key) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.llen(key);
+        } catch (Exception e) {
+            logger.error("根据key获取list长度失败", e);
+            return -1;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据key,start,end 获取list数据
+     * @param key list集合名称
+     * @param start 从index=start开始获取(index 从0开始)
+     * @param end 到index=end
+     * @return 有则返回list结合没有则返回空集合([])
+     */
+    public static  List<String> getList(String key,long start,long end) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.lrange(key, start, end);
+        } catch (Exception e) {
+            logger.error("根据key从集合中获取数据失败", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 获取list集合所有数据
+     * @param listName
+     * @return
+     */
+    public static  List<String> getList(String listName) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.lrange(listName, 0, redis.llen(listName));
+        } catch (Exception e) {
+            logger.error("获取list集合所有数据", e);
+            return null;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据list名称删除list
+     * @param listName
+     * @return 返回删除list集合size大小,删除异常返回-1
+     */
+    public static long delList(String listName) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.expire(listName, 0);
+        } catch (Exception e) {
+            logger.error("根据list名称删除list失败", e);
+            return -1;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+    /**
+     * 根据key名称删除数据
+     * @param keyName
+     * @return
+     */
+    public static boolean del(String keyName) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.expire(keyName, 0)==1?true:false;
+        } catch (Exception e) {
+            logger.error("根据key名称删除数据失败", e);
+            return false;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
     public static void main(String[] args) {
-        System.out.println(        getPool().getResource().hmget("test1","ctl","kym","zxp"));
-        String memberId="2";
-        String merchantId="8";
-        addSecurityKey(memberId,merchantId);
-        System.out.println(getSecurityKey(memberId,merchantId));
-        System.out.println(flushSecurityKey(memberId,merchantId));
-        addMapData("ctl","age"+UUID.randomUUID(),"25");
-        System.out.println(getFromMap("ctl","age"+UUID.randomUUID()));
-        System.out.println(flushMapData("ctl","age","27"+UUID.randomUUID()));
-        Map<String ,String > map =new HashMap<>();
-        map.put("ctl","26");
-        map.put("kym","27");
-        System.out.println(addMapData("test1",map));
-        map.put("ctl","27");
-        map.put("kym","28");
-        map.put("zxp","28");
-        System.out.println(getFromMap("test1","ctl","kym","zxp"));
-        flushMapData("test1",map);
-        System.out.println(getFromMap("test1","ctl","kym","zxp"));
-        close();
+
     }
 
 }
