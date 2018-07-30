@@ -8,8 +8,8 @@ public class MongoDbDemo1 {
             MongoClient mongoClient = new MongoClient( "192.168.42.29" , 27017 );
 
             // 连接到数据库
-            MongoDatabase mongoDatabase = mongoClient.getDatabase("mycol");
-            System.out.println("Connect to database successfully");
+            MongoDatabase mongoDatabase = mongoClient.getDatabase("test");
+            System.out.println("Connect to database successfully"+mongoDatabase);
 
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
