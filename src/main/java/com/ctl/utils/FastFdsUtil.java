@@ -10,7 +10,6 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,11 +20,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * <p>Title: FastFdsTest</p>
+ * <p>Title: FastFdsUtil</p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2018</p>
- * <p>Company: www.hanshow.com</p>
- *
+ * <p>Company: www.ctl.com</p>
  * @author guolin
  * @version 1.0
  * @date 2018-08-14 21:04
@@ -52,23 +50,28 @@ public class FastFdsUtil {
         }
     }
 
+    /**
+     * 上传到服务器
+     * @param localFilePath 本地文件全路径
+     * @return
+     */
     public String[] fileLocalUpload(String localFilePath) {
         return fileLocalUpload(localFilePath, null);
     }
 
+    /**
+     * 上传到服务器
+     * @param localFilePath 本地文件全路径
+     * @param nvp  NameValuePair
+     * @return
+     */
     public String[] fileLocalUpload(String localFilePath, NameValuePair[] nvp) {
-
         try {
             TrackerClient tracker = new TrackerClient();
             TrackerServer trackerServer = tracker.getConnection();
             StorageServer storageServer = null;
 
             StorageClient storageClient = new StorageClient(trackerServer, storageServer);
-//          NameValuePair nvp = new NameValuePair("age", "18");
-//            NameValuePair nvp[] = new NameValuePair[]{
-//                    new NameValuePair("age", "18"),
-//                    new NameValuePair("sex", "male")
-//            };
             String fileIds[] = storageClient.upload_file(localFilePath, "png", nvp);
             logger.info("fileIds.length={}", fileIds.length);
             logger.info("组名={}", fileIds[0]);
@@ -84,10 +87,30 @@ public class FastFdsUtil {
         return null;
     }
 
+    /**
+     * 从文件服务器下载
+     * @param remoteFilename 文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @return
+     */
     public boolean fileServerDownload(String remoteFilename) {
         return fileServerDownload("group1", remoteFilename, System.getProperty("java.io.tmpdir") + UUID.randomUUID().toString() + ".tmp");
     }
-
+    /**
+     * 从文件服务器下载
+     * @param remoteFilename 服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @param localDownloadPath 下载到本地路径
+     * @return
+     */
+    public boolean fileServerDownload(String remoteFilename, String localDownloadPath) {
+        return fileServerDownload("group1", remoteFilename, localDownloadPath);
+    }
+    /**
+     * 从文件服务器下载
+     * @param groupName 组名
+     * @param remoteFilename 服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @param localDownloadPath 下载到本地路径
+     * @return
+     */
     public boolean fileServerDownload(String groupName, String remoteFilename, String localDownloadPath) {
         try {
             TrackerClient tracker = new TrackerClient();
@@ -103,10 +126,20 @@ public class FastFdsUtil {
         }
     }
 
+    /**
+     * 获取文件信息
+     * @param remoteFilename  服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @return
+     */
     public FileInfo getFileInfo(String remoteFilename) {
         return getFileInfo("group1", remoteFilename);
     }
-
+    /**
+     * 获取文件信息
+     * @param groupName 组名
+     * @param remoteFilename  服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @return
+     */
     public FileInfo getFileInfo(String groupName, String remoteFilename) {
         try {
             TrackerClient tracker = new TrackerClient();
@@ -146,10 +179,21 @@ public class FastFdsUtil {
         }
     }
 
+    /**
+     * 删除服务器文件
+     * @param remoteFilename 服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @return
+     */
     public boolean delete(String remoteFilename) {
         return delete("group1", remoteFilename);
     }
 
+    /**
+     * 删除服务器文件
+     * @param groupName 组名
+     * @param remoteFilename  服务器文件名称例如: M00/00/00/wKgqHVty2ZCAHaBvAAE0vHMtwgw608.png
+     * @return
+     */
     public boolean delete(String groupName, String remoteFilename) {
         try {
             TrackerClient tracker = new TrackerClient();
