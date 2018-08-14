@@ -2,6 +2,7 @@ package com.ctl.utils;
 
 import com.ctl.utils.json.JsonDateValueProcessor;
 import com.ctl.utils.json.JsonNumberValueProcessor;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.apache.commons.io.IOUtils;
@@ -210,9 +211,10 @@ public class FastFdsUtil {
 
     public static void main(String[] args) {
         FastFdsUtil fastFdsTest = new FastFdsUtil();
-        logger.info(JSONObject.fromObject(fastFdsTest.getFileInfo("M00/00/00/wKgqHVty2OeAACY6AAE0vHMtwgw725.png")).toString());
-        fastFdsTest.fileLocalUpload("E:\\fAPP\\_20180814101019.png");
-        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", "M00/00/00/wKgqHVty1dWANx6HAAE0vHMtwgw855.png", "e:\\test.png"));
-        logger.info("delresult={}", fastFdsTest.delete("M00/00/00/wKgqHVty18mAV-6UAAE0vHMtwgw879.png"));
+        String[] strings = fastFdsTest.fileLocalUpload("E:\\fAPP\\_20180814101019.png");
+        logger.info(JSONArray.fromObject(strings,jsonConfig).toString());
+        logger.info(JSONObject.fromObject(fastFdsTest.getFileInfo(strings[1]),jsonConfig).toString());
+        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
+        logger.info("delresult={}", fastFdsTest.delete( strings[1]));
     }
 }
