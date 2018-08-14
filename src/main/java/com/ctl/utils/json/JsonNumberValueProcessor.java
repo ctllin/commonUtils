@@ -2,7 +2,6 @@ package com.ctl.utils.json;
 
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsonValueProcessor;
-
 import java.io.Serializable;
 
 /**
