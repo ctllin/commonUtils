@@ -70,7 +70,6 @@ public class FastFdsUtil {
             TrackerClient tracker = new TrackerClient();
             TrackerServer trackerServer = tracker.getConnection();
             StorageServer storageServer = null;
-
             StorageClient storageClient = new StorageClient(trackerServer, storageServer);
             String fileIds[] = storageClient.upload_file(localFilePath, "png", nvp);
             logger.info("fileIds.length={}", fileIds.length);
