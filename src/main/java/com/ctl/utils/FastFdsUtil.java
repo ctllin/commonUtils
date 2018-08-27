@@ -11,6 +11,8 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -216,5 +218,13 @@ public class FastFdsUtil {
         logger.info(JSONObject.fromObject(fastFdsTest.getFileInfo(strings[1]),jsonConfig).toString());
         logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
         logger.info("delresult={}", fastFdsTest.delete( strings[1]));
+
+        File file = new File("E:\\fAPP\\quan");
+        String[] list = file.list();
+        for(String name:list){
+            String[] stringss = fastFdsTest.fileLocalUpload(file.getPath()+File.separator+name);
+            //logger.info(JSONArray.fromObject(stringss,jsonConfig).toString());
+            logger.info(name+"\t"+stringss[0]+"/"+stringss[1]);
+        }
     }
 }
