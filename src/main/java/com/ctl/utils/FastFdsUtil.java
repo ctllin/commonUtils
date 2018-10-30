@@ -75,9 +75,9 @@ public class FastFdsUtil {
             StorageServer storageServer = null;
             StorageClient storageClient = new StorageClient(trackerServer, storageServer);
             String fileIds[] = storageClient.upload_file(localFilePath, "png", nvp);
-            logger.info("fileIds.length={}", fileIds.length);
-            logger.info("组名={}", fileIds[0]);
-            logger.info("路径={} ", fileIds[1]);
+           // logger.info("fileIds.length={}", fileIds.length);
+           // logger.info("组名={}", fileIds[0]);
+            //logger.info("路径={} ", fileIds[1]);
             return fileIds;
         } catch (FileNotFoundException e) {
             logger.error("FastFds上传失败", e);
@@ -213,13 +213,13 @@ public class FastFdsUtil {
 
     public static void main(String[] args) {
         FastFdsUtil fastFdsTest = new FastFdsUtil();
-        String[] strings = fastFdsTest.fileLocalUpload("E:\\fAPP\\_20180814101019.png");
-        logger.info(JSONArray.fromObject(strings,jsonConfig).toString());
-        logger.info(JSONObject.fromObject(fastFdsTest.getFileInfo(strings[1]),jsonConfig).toString());
-        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
-        logger.info("delresult={}", fastFdsTest.delete( strings[1]));
+//        String[] strings = fastFdsTest.fileLocalUpload("E:\\fAPP\\_20180814101019.png");
+//        logger.info(JSONArray.fromObject(strings,jsonConfig).toString());
+//        logger.info(JSONObject.fromObject(fastFdsTest.getFileInfo(strings[1]),jsonConfig).toString());
+//        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
+//        logger.info("delresult={}", fastFdsTest.delete( strings[1]));
 
-        File file = new File("E:\\fAPP\\quan");
+        File file = new File("E:\\fAPP\\goods");
         String[] list = file.list();
         for(String name:list){
             String[] stringss = fastFdsTest.fileLocalUpload(file.getPath()+File.separator+name);
