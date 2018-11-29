@@ -36,9 +36,9 @@ public class HookTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (; ; ) {
+        for (int i=100;i<2000 ;i++ ) {
             try {
-                TimeUnit.MILLISECONDS.sleep(1);
+                TimeUnit.MILLISECONDS.sleep(100);
                 System.out.println("program is runnning.");
             } catch (InterruptedException e) {
                 e.printStackTrace();
