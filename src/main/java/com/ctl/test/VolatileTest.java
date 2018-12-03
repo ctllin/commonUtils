@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class VolatileTest {
     final static int MAX = 5;
-    //static volatile int init_value = 0;
-    static  int init_value = 0;
+    //static volatile int init_value = 0;//线程会执行结束
+    static  int init_value = 0;//线程无法推出
 
     public static void main(String[] args) {
         new Thread(() -> {
