@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class VolatileTest {
     final static int MAX = 5;
     //static volatile int init_value = 0;//线程会执行结束
-    static  int init_value = 0;//线程无法推出
+    static  int init_value = 0;//线程有时可以退出有时无法退出
 
     public static void main(String[] args) {
         new Thread(() -> {
@@ -33,6 +33,8 @@ public class VolatileTest {
 
                 System.out.printf("The init_value will be change to[%d]\n", ++localValue);
                 init_value = localValue;
+               // System.out.printf("[%d]\t[%d]\n",init_value ,localValue);
+
             }
             try {
                 TimeUnit.SECONDS.sleep(1);
