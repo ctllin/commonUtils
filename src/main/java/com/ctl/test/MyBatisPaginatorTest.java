@@ -1,8 +1,5 @@
 package com.ctl.test;
 
-import com.ctl.test.mapper.PersonMapper;
-import com.ctl.test.po.Person;
-import com.ctl.test.po.PersonExample;
 import com.github.miemiedev.mybatis.paginator.domain.PageBounds;
 import com.github.miemiedev.mybatis.paginator.domain.PageList;
 import com.github.miemiedev.mybatis.paginator.domain.Paginator;
@@ -43,16 +40,16 @@ public class MyBatisPaginatorTest {
             logger.info("Bean所在的包：" + beanPackage);
             logger.info("\r\n");
         }
-        PersonMapper mapper= (PersonMapper)context.getBean("personMapper");
-        Map<String,Object> dataMap=new HashMap<>();
-        PersonExample example=new PersonExample();
-        logger.info( ""+mapper.countByExample(example));
-        logger.info(""+mapper.selectByParams(dataMap,new PageBounds(2,10)));
-        PageList<Person> peopleList = (PageList<Person>) mapper.selectByParams(dataMap, new PageBounds(2, 10));
-        Paginator paginator = peopleList.getPaginator();
-        logger.info("totalPages:"+paginator.getTotalPages());
-        logger.info("totalCount:"+paginator.getTotalCount());
-        logger.info("page:"+paginator.getPage());
-        logger.info(JSONArray.fromObject(peopleList).toString());
+//        PersonMapper mapper= (PersonMapper)context.getBean("personMapper");
+//        Map<String,Object> dataMap=new HashMap<>();
+//        PersonExample example=new PersonExample();
+//        logger.info( ""+mapper.countByExample(example));
+//        logger.info(""+mapper.selectByParams(dataMap,new PageBounds(2,10)));
+//        PageList<Person> peopleList = (PageList<Person>) mapper.selectByParams(dataMap, new PageBounds(2, 10));
+//        Paginator paginator = peopleList.getPaginator();
+//        logger.info("totalPages:"+paginator.getTotalPages());
+//        logger.info("totalCount:"+paginator.getTotalCount());
+//        logger.info("page:"+paginator.getPage());
+//        logger.info(JSONArray.fromObject(peopleList).toString());
     }
 }
