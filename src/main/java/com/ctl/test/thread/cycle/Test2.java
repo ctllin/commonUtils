@@ -18,7 +18,7 @@ public class Test2 {
     public static void main(String[] args) {
         final TaskLifeCycle<String> lifeCycle = new TaskLifeCycle.EmptyLifeCycle<String>() {
             public void onFinish(Thread thread, String result) {
-                System.out.println("This result is " + result);
+                System.out.println("onFinsh......\tThis result is " + result);
             }
         };
         Observable observable = new ObservableThread<>(lifeCycle, () -> {
