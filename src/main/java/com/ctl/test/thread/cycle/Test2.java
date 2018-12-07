@@ -23,7 +23,7 @@ public class Test2 {
         };
         Observable observable = new ObservableThread<>(lifeCycle, () -> {
             try {
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

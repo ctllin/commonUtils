@@ -50,7 +50,7 @@ public class ObservableThread<T> extends Thread implements Observable{
                 case RUNNING:
                     this.lifeCycle.onRunning(currentThread());
                 case DONE:
-                    this.lifeCycle.onFinsh(currentThread(), result);
+                    this.lifeCycle.onFinish(currentThread(), result);
                 case ERROR:
                     this.lifeCycle.onError(currentThread(), e);
                     break;

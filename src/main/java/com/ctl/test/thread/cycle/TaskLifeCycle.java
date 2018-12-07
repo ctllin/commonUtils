@@ -13,7 +13,7 @@ package com.ctl.test.thread.cycle;
 public interface TaskLifeCycle<T> {
     void onStart(Thread thread);
     void onRunning(Thread thread);
-    void onFinsh(Thread thread,T result);
+    void onFinish(Thread thread,T result);
     void onError(Thread thread,Exception e);
     class EmptyLifeCycle<T> implements TaskLifeCycle<T>{
         @Override
@@ -27,7 +27,7 @@ public interface TaskLifeCycle<T> {
         }
 
         @Override
-        public void onFinsh(Thread thread, T result) {
+        public void onFinish(Thread thread, T result) {
             System.out.println("onFinsh......" + result);
         }
 
