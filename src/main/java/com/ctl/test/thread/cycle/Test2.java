@@ -19,6 +19,7 @@ public class Test2 {
                 System.out.println("onFinsh......\tThis result is " + result);
             }
         };
+        //第二个参数及为Task接口call的匿名实现
         Observable observable = new ObservableThread<>(lifeCycle, () -> {
             try {
                 TimeUnit.SECONDS.sleep(1);
