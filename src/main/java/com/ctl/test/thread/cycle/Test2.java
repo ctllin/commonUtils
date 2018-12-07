@@ -1,7 +1,5 @@
 package com.ctl.test.thread.cycle;
 
-import net.sf.json.JSONObject;
-
 import java.util.concurrent.TimeUnit;
 
 /**
