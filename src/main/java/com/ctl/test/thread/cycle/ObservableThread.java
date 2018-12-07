@@ -27,6 +27,16 @@ public class ObservableThread<T> extends Thread implements Observable{
         this.lifeCycle = lifeCycle;
         this.task = task;
     }
+    public final void run() {
+        this.update(Cycle.STARTED, null, null);
+        try {
+            this.update(Cycle.RUNNING, null, null);
+            T result = this.task.call();
+            this.update(Cycle.DONE, result, null);
+        } catch (Exception e) {
+            this.update(Cycle.ERROR, null, e);
+        }
+    }
 
     private void update(Cycle cycle, T result, Exception e) {
         this.cycle = cycle;
@@ -52,16 +62,6 @@ public class ObservableThread<T> extends Thread implements Observable{
         }
     }
 
-    public final void run() {
-        this.update(Cycle.STARTED, null, null);
-        try {
-            this.update(Cycle.RUNNING, null, null);
-            T result = this.task.call();
-            this.update(Cycle.DONE, result, null);
-        } catch (Exception e) {
-            this.update(Cycle.ERROR, null, e);
-        }
-    }
 
     @Override
     public Cycle getCycle() {
