@@ -1,7 +1,5 @@
 package com.ctl.test.thread.cycle;
 
-import net.sf.json.JSONObject;
-
 /**
  * <p>Title: TaskLifeCycle</p>
  * <p>Description: </p>
@@ -30,7 +28,7 @@ public interface TaskLifeCycle<T> {
 
         @Override
         public void onFinsh(Thread thread, T result) {
-            System.out.println("onFinsh......" + JSONObject.fromObject(result));
+            System.out.println("onFinsh......" + result);
         }
 
         @Override
