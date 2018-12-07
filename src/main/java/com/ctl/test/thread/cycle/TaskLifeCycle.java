@@ -34,6 +34,7 @@ public interface TaskLifeCycle<T> {
         @Override
         public void onError(Thread thread, Exception e) {
             System.out.println("onError......");
+            e.printStackTrace();
         }
     }
 }
