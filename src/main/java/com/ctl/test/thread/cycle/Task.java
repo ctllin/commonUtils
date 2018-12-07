@@ -10,6 +10,7 @@ package com.ctl.test.thread.cycle;
  * @version 1.0
  * @date 2018-12-07 17:04
  */
+@FunctionalInterface
 public interface Task<T> {
     T call();
 }
