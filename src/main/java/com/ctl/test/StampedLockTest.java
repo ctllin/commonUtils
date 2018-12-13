@@ -67,22 +67,18 @@ public class StampedLockTest {
 
     public static void main(String[] args) {
 
-//        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
-//            StampedLockTest test = new StampedLockTest();
-//            test.move(Math.random(),Math.random());
-//        }).start());
-//        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
-//            StampedLockTest test = new StampedLockTest();
-//            test.moveIfAtOrigin(Math.random(),Math.random());
-//        }).start());
-//        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
-//            StampedLockTest test = new StampedLockTest();
-//            test.distanceFromOrigin();
-//        }).start());
-        StampedLock sl = new StampedLock();//定义了StampedLock锁,
-       long stamp = sl.writeLock();
-        System.out.println(stamp);
-        stamp = sl.tryConvertToWriteLock(stamp);
-        System.out.println(stamp);
+        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
+            StampedLockTest test = new StampedLockTest();
+            test.move(Math.random(),Math.random());
+        }).start());
+        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
+            StampedLockTest test = new StampedLockTest();
+            test.moveIfAtOrigin(Math.random(),Math.random());
+        }).start());
+        IntStream.range(1,10000).boxed().forEach(i->new Thread(()->{
+            StampedLockTest test = new StampedLockTest();
+            test.distanceFromOrigin();
+        }).start());
+
     }
 }
