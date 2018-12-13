@@ -57,7 +57,7 @@ public class StampedLockTest {
                     break;
                 } else {
                     sl.unlockRead(stamp);
-                    stamp = sl.writeLock();
+                    stamp = sl.writeLock();//获取到writeLock后 再次使用tryConvertToWriteLock 得到的stamp是同一个
                 }
             }
         } finally {
