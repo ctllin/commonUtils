@@ -219,7 +219,7 @@ public class FastFdsUtil {
 //        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
 //        logger.info("delresult={}", fastFdsTest.delete( strings[1]));
 
-        File file = new File("C:\\Users\\hanshow\\Desktop\\运营管理1.1-10.13\\图片\\banner");
+        File file = new File("C:\\Users\\hanshow\\Desktop\\pic");
         String[] list = file.list();
         for(String name:list){
             String[] stringss = fastFdsTest.fileLocalUpload(file.getPath()+File.separator+name);
