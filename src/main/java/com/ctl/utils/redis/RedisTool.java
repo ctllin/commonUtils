@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.params.SetParams;
 
 import java.io.IOException;
 import java.util.*;
@@ -80,12 +81,20 @@ public class RedisTool {
          *设置锁并设置超时时间，lockKey表示Redis key，requestId表示Redis value，SET_IF_NOT_EXIST表示有值不进行设置（NX），
          * SET_WITH_EXPIRE_TIME表示是否设置超时时间（PX）设置，expireTime表示设置超时的毫秒值
          * */
-        String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
-
-        if (LOCK_SUCCESS.equals(result)) {
-            return true;
-        }
-        return false;
+        //String result = jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);
+       try {
+           SetParams params = new SetParams();
+           params.ex(expireTime);
+           System.out.println("getLock pre"+jedis.get(lockKey));
+           String result = jedis.set(lockKey, requestId, params);
+           if (LOCK_SUCCESS.equals(result)) {
+               return true;
+           }
+           return false;
+       }catch (Exception e){
+           System.out.println(e);
+           return false;
+       }
     }
 
     /**
@@ -101,13 +110,33 @@ public class RedisTool {
          * 利用Lua脚本代码，首先获取锁对应的value值，检查是否与requestId相等，如果相等则删除锁（解锁）
          * eval命令执行Lua代码的时候，Lua代码将被当成一个命令去执行，并且直到eval命令执行完成，Redis才会执行其他命令，这样就不会出现上一个代码执行完挂了后边的出现问题，还是一致性的解决
          * */
-        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-        Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
-
-        if (RELEASE_SUCCESS.equals(result)) {
-            return true;
+        try {
+            System.out.println("name=" + jedis.get("name"));
+            System.out.println(jedis.get(lockKey));
+            String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+            Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
+            if (RELEASE_SUCCESS.equals(result)) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) { //当lockKey数据所在的master,服务异常后
+            System.out.println(e);
+            try {
+                String lockValue = jedis.get(lockKey);
+                System.out.println("第一次获取失败后第二次获取该锁" + lockValue);
+                if (lockKey != null && !"".equals(lockKey)) { //当lockKey数据所在的master,服务异常后,获取lock,如果获取成功进行第二次释放锁操作
+                    String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+                    Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
+                    if (RELEASE_SUCCESS.equals(result)) {
+                        return true;
+                    }
+                    return false;
+                }
+            } catch (Exception e1) {
+                System.out.println("e1:" + e1);
+            }
+            return false;
         }
-        return false;
 
     }
 
@@ -116,10 +145,40 @@ public class RedisTool {
         String lockKey = "lock_ctl";
 
         boolean resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
-        System.out.println(resultLock);
+        System.out.println(0 + " 锁定 " + resultLock);
+//        获取集群信息
+//        192.168.42.29:6380> cluster nodes
+//        942a9781eda2ab833e18ca1d3983e1a63917ed48 192.168.42.29:6380@16380 myself,master - 0 1547030154000 2 connected 5461-10922
+//        2c69433fe67a7a71d99da46f132c1cbc0d688186 192.168.42.29:6382@16382 slave 942a9781eda2ab833e18ca1d3983e1a63917ed48 0 1547030156638 4 connected
+//        8b7d4e667d7958d7a0beb2bc78f626a36836355c 192.168.42.29:6384@16384 slave 73ad4dd96bc69597fbe44e2f2dd44cb844e89897 0 1547030157545 20 connected
+//        73ad4dd96bc69597fbe44e2f2dd44cb844e89897 192.168.42.29:6379@16379 master - 0 1547030156537 20 connected 0-5460
+//        ff4ee9b42de3706f0b7fcdab4edd4a1646beb394 192.168.42.29:6381@16381 master - 0 1547030157644 16 connected 10923-16383
+//        ac0f6d9e988c62849fb2032827e80b422edad514 192.168.42.29:6383@16383 slave ff4ee9b42de3706f0b7fcdab4edd4a1646beb394 0 1547030157000 16 connected
+//        192.168.42.29:6380>
+
+//        获取lockKey在哪个master上
+//        192.168.42.29:6381> get lock_ctl
+//                -> Redirected to slot [2942] located at 192.168.42.29:6379
+//        "a3959719-137d-4ba1-8ffa-16e33467cbba"
+        // 发现数据存储在192.168.42.29:6379这个master上将192.168.42.29:6379 杀死
+//        192.168.42.29:6380> cluster nodes
+//        942a9781eda2ab833e18ca1d3983e1a63917ed48 192.168.42.29:6380@16380 myself,master - 0 1547030369000 2 connected 5461-10922
+//        2c69433fe67a7a71d99da46f132c1cbc0d688186 192.168.42.29:6382@16382 slave 942a9781eda2ab833e18ca1d3983e1a63917ed48 0 1547030369000 4 connected
+//        8b7d4e667d7958d7a0beb2bc78f626a36836355c 192.168.42.29:6384@16384 master - 0 1547030370833 21 connected 0-5460
+//        73ad4dd96bc69597fbe44e2f2dd44cb844e89897 192.168.42.29:6379@16379 master,fail - 1547030310724 1547030310000 20 disconnected
+//        ff4ee9b42de3706f0b7fcdab4edd4a1646beb394 192.168.42.29:6381@16381 master - 0 1547030369527 16 connected 10923-16383
+//        ac0f6d9e988c62849fb2032827e80b422edad514 192.168.42.29:6383@16383 slave ff4ee9b42de3706f0b7fcdab4edd4a1646beb394 0 1547030369828 16 connected
+
+        //此时如果有另一个新的JedisCluster创建,是可以获取到到该锁,如果requestId正确也可以释放该锁，但是本JedisCluster在断开master后，无法获取到该锁,自然释放该锁失败,第二次获取或释放锁会成功
         boolean resultRelease =  RedisTool.releaseDistributedLock(cluster,lockKey,uuid);
-        System.out.println(resultRelease);
-        cluster.set("name"+System.currentTimeMillis(),"ctl");
+        System.out.println(1 + " 解锁 " + resultRelease);
+        for (int i = 0; i < 10; i++) {
+            resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
+            System.out.println(i + " 锁定 " + resultLock);
+            resultRelease = RedisTool.releaseDistributedLock(cluster, lockKey, uuid);
+            System.out.println(i + " 解锁 " + resultRelease);
+        }
+        cluster.set("name","ctl");
         System.out.println(cluster.get("name"));
         cluster.close();
 

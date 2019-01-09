@@ -25,7 +25,7 @@ public class RedisShardedJedisPipelinePool {
 		}
 		List<Object> results = pipeline.syncAndReturnAll();
 		long end = System.currentTimeMillis();
-		pool.returnResource(one);
+		//pool.returnResource(one);
 		System.out.println("Pipelined@Pool SET: " + ((end - start) / 1000.0) + " seconds results.size()="+results.size());
 		pool.destroy();
 	}
