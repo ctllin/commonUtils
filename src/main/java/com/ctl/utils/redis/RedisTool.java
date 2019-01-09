@@ -85,8 +85,10 @@ public class RedisTool {
        try {
            SetParams params = new SetParams();
            params.ex(expireTime);
+           params.nx();//不加,可以重复加锁(此行执行后才可以正常锁)
+           // jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);  是2.9.0写法
            System.out.println("getLock pre"+jedis.get(lockKey));
-           String result = jedis.set(lockKey, requestId, params);
+           String result = jedis.set(lockKey, requestId, params); //3.0.1写法
            if (LOCK_SUCCESS.equals(result)) {
                return true;
            }
@@ -145,6 +147,8 @@ public class RedisTool {
         String lockKey = "lock_ctl";
 
         boolean resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
+        System.out.println(0 + " 锁定 " + resultLock);
+         resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
         System.out.println(0 + " 锁定 " + resultLock);
 //        获取集群信息
 //        192.168.42.29:6380> cluster nodes
