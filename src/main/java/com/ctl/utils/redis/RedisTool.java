@@ -19,10 +19,7 @@ import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *
@@ -65,7 +62,8 @@ public class RedisTool {
                 }
             }
             //加入前面三个为master后面三个为从属当关闭前三个后 后三个会自动变master 然后从后三个获取数据
-            cluster = new JedisCluster(nodes, 100000, 20000, 5, ConfigUtils.getType("redis.auth"), config);
+            cluster = new JedisCluster(nodes, 1000, 1000, 5, ConfigUtils.getType("redis.auth"), config);
+            System.out.println(Arrays.deepToString(nodes.toArray()));
         }
     }
 
