@@ -121,7 +121,7 @@ public class RedisTool {
         System.out.println(resultLock);
         boolean resultRelease =  RedisTool.releaseDistributedLock(cluster,lockKey,uuid);
         System.out.println(resultRelease);
-        cluster.set("name","ctl");
+        cluster.set("name"+System.currentTimeMillis(),"ctl");
         System.out.println(cluster.get("name"));
         cluster.close();
 
