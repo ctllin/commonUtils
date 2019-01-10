@@ -12,13 +12,12 @@ package com.ctl.utils.redis;
  */
 
 import com.ctl.utils.ConfigUtils;
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.params.SetParams;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -27,21 +26,23 @@ import java.util.*;
  * redis实现分布式锁，并释放锁
  */
 public class RedisTool {
-    private static JedisCluster cluster  = null;
+    static  final  Logger logger = LoggerFactory.getLogger(RedisTool.class);
+    public static JedisCluster cluster  = null;
 
-    private static final String LOCK_SUCCESS = "OK";
+    public static final String LOCK_SUCCESS = "OK";
     private static final String SET_IF_NOT_EXIST = "NX";
     private static final String SET_WITH_EXPIRE_TIME = "PX";
-    private static final Long RELEASE_SUCCESS = 1L;
+    public static final Long RELEASE_SUCCESS = 1L;
+    public static final int EXPIRE_TIME = 3;
     static {
         JedisPoolConfig config = new JedisPoolConfig();
         //控制一个pool可分配多少个jedis实例，通过pool.getResource()来获取；
         //设置的逐出策略类名, 默认DefaultEvictionPolicy(当连接超过最大空闲时间,或连接数超过最大空闲连接数)
         config.setEvictionPolicyClassName("org.apache.commons.pool2.impl.DefaultEvictionPolicy");
         //如果赋值为-1，则表示不限制；如果pool已经分配了maxTotal个jedis实例，则此时pool的状态为exhausted(耗尽)。
-        config.setMaxTotal(50);
+        config.setMaxTotal(6);
         //控制一个pool最多有多少个状态为idle(空闲的)的jedis实例。
-        config.setMaxIdle(5);
+        config.setMaxIdle(2);
         //表示当borrow(引入)一个jedis实例时，最大的等待时间，如果超过等待时间，则直接抛出JedisConnectionException；
         config.setMaxWaitMillis(1000 * 100);
         //在borrow一个jedis实例时，是否提前进行validate操作；如果为true，则得到的jedis实例均是可用的；
@@ -87,14 +88,14 @@ public class RedisTool {
            params.ex(expireTime);
            params.nx();//不加,可以重复加锁(此行执行后才可以正常锁)
            // jedis.set(lockKey, requestId, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);  是2.9.0写法
-           System.out.println("getLock pre"+jedis.get(lockKey));
+           System.out.println(cluster.getClusterNodes()+" getLock pre "+jedis.get(lockKey));
            String result = jedis.set(lockKey, requestId, params); //3.0.1写法
            if (LOCK_SUCCESS.equals(result)) {
                return true;
            }
            return false;
        }catch (Exception e){
-           System.out.println(e);
+           System.err.println(e);
            return false;
        }
     }
@@ -113,7 +114,7 @@ public class RedisTool {
          * eval命令执行Lua代码的时候，Lua代码将被当成一个命令去执行，并且直到eval命令执行完成，Redis才会执行其他命令，这样就不会出现上一个代码执行完挂了后边的出现问题，还是一致性的解决
          * */
         try {
-            System.out.println("name=" + jedis.get("name"));
+            System.out.println(cluster.getClusterNodes()+ "name=" + jedis.get("name"));
             System.out.println(jedis.get(lockKey));
             String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
             Object result = jedis.eval(script, Collections.singletonList(lockKey), Collections.singletonList(requestId));
@@ -122,7 +123,8 @@ public class RedisTool {
             }
             return false;
         } catch (Exception e) { //当lockKey数据所在的master,服务异常后
-            System.out.println(e);
+            System.err.println(e);
+            logger.error("第一次释放失败{}",cluster.getClusterNodes(),e);
             try {
                 String lockValue = jedis.get(lockKey);
                 System.out.println("第一次获取失败后第二次获取该锁" + lockValue);
@@ -135,7 +137,8 @@ public class RedisTool {
                     return false;
                 }
             } catch (Exception e1) {
-                System.out.println("e1:" + e1);
+                System.err.println("e1:" + e1);
+                logger.error("第二次释放失败{}",cluster.getClusterNodes(),e1);
             }
             return false;
         }
@@ -144,12 +147,15 @@ public class RedisTool {
 
     public static void main(String[] args) throws IOException {
         String uuid = UUID.randomUUID().toString();
-        String lockKey = "lock_ctl";
+        String lockKey = "lock";
 
-        boolean resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
-        System.out.println(0 + " 锁定 " + resultLock);
-         resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
-        System.out.println(0 + " 锁定 " + resultLock);
+        boolean resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, RedisTool.EXPIRE_TIME);
+        if (resultLock) {
+            System.out.println(" 第一次锁定 " + resultLock);
+        } else {
+            System.err.println(" 第一次锁定 " + resultLock);
+        }
+
 //        获取集群信息
 //        192.168.42.29:6380> cluster nodes
 //        942a9781eda2ab833e18ca1d3983e1a63917ed48 192.168.42.29:6380@16380 myself,master - 0 1547030154000 2 connected 5461-10922
@@ -174,17 +180,139 @@ public class RedisTool {
 //        ac0f6d9e988c62849fb2032827e80b422edad514 192.168.42.29:6383@16383 slave ff4ee9b42de3706f0b7fcdab4edd4a1646beb394 0 1547030369828 16 connected
 
         //此时如果有另一个新的JedisCluster创建,是可以获取到到该锁,如果requestId正确也可以释放该锁，但是本JedisCluster在断开master后，无法获取到该锁,自然释放该锁失败,第二次获取或释放锁会成功
+        //如果该JedisCluster在断开master后，获取其他数据，这些数据不在断开的master上，也可以正常使用，但是一旦获取在该master上的数据会报redis.clients.jedis.exceptions.JedisClusterMaxAttemptsException: No more cluster attempts left.
         boolean resultRelease =  RedisTool.releaseDistributedLock(cluster,lockKey,uuid);
-        System.out.println(1 + " 解锁 " + resultRelease);
-        for (int i = 0; i < 10; i++) {
-            resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, 300000);
-            System.out.println(i + " 锁定 " + resultLock);
+       if(resultRelease){
+           System.out.println("第一次解锁 " + resultRelease);
+       }else {
+           System.err.println("第一次解锁 " + resultRelease);
+       }
+        for (int i = 2; i < 1000000000; i++) {
+            resultLock = RedisTool.tryGetDistributedLock(cluster, lockKey, uuid, RedisTool.EXPIRE_TIME);
+            if (resultLock) {
+                System.out.println( "第"+i+"次锁定 " + resultLock);
+            } else {
+                System.err.println( "第"+i+"次锁定 " + resultLock);
+            }
             resultRelease = RedisTool.releaseDistributedLock(cluster, lockKey, uuid);
-            System.out.println(i + " 解锁 " + resultRelease);
+            if(resultRelease){
+                System.out.println("第"+i+"次解锁 " + resultRelease);
+            }else {
+                System.err.println("第"+i+"次解锁 " + resultRelease);
+            }
+            RedisThreadLock lock = new RedisThreadLock("lock", i, cluster, lockKey, uuid);
+            Thread lockThread = new Thread(lock);
+            lockThread.setDaemon(true);
+            lockThread.start();
+
+            RedisThreadRelease release = new RedisThreadRelease("release", i, cluster, lockKey, uuid);
+            Thread releaseThread = new Thread(release);
+            releaseThread.setDaemon(true);
+            releaseThread.start();
         }
+
         cluster.set("name","ctl");
+        cluster.set("name1","ctl1");
+        cluster.set("name2","ctl2");
+        cluster.set("name3","ctl3");
+        cluster.set("name4","ctl4");
+        cluster.set("name5","ctl5");
+        cluster.set("name6","ctl6");
         System.out.println(cluster.get("name"));
         cluster.close();
 
+    }
+}
+class RedisThreadLock implements Runnable{
+    private String name;
+    private int times;
+    private JedisCluster jedis;
+    private String lockKey;
+    private String requestId;
+    public RedisThreadLock() {
+    }
+
+    public RedisThreadLock(String name, int times) {
+        this.name = name;
+        this.times = times;
+    }
+
+    public RedisThreadLock(String name, int times, JedisCluster jedis, String lockKey, String requestId) {
+        this.name = name;
+        this.times = times;
+        this.jedis = jedis;
+        this.lockKey = lockKey;
+        this.requestId = requestId;
+    }
+
+    /**
+     * When an object implementing interface <code>Runnable</code> is used
+     * to create a thread, starting the thread causes the object's
+     * <code>run</code> method to be called in that separately executing
+     * thread.
+     * <p>
+     * The general contract of the method <code>run</code> is that it may
+     * take any action whatsoever.
+     *
+     * @see Thread#run()
+     */
+    @Override
+    public void run() {
+        System.out.println(name + " " + times + " " + requestId + " 尝试获取锁");
+        boolean b = RedisTool.tryGetDistributedLock(jedis, lockKey, requestId, RedisTool.EXPIRE_TIME);
+        if (b) {
+            System.out.println(name + " " + times + " " + requestId + " 获取锁" + b);
+        } else {
+            System.err.println(name + " " + times + " " + requestId + " 获取锁" + b);
+        }
+    }
+}
+class RedisThreadRelease implements Runnable{
+    private String name;
+    private int times;
+    private JedisCluster jedis;
+    private String lockKey;
+    private String requestId;
+    public RedisThreadRelease() {
+    }
+
+    public RedisThreadRelease(String name, int times) {
+        this.name = name;
+        this.times = times;
+    }
+
+    public RedisThreadRelease(String name, int times, JedisCluster jedis, String lockKey, String requestId) {
+        this.name = name;
+        this.times = times;
+        this.jedis = jedis;
+        this.lockKey = lockKey;
+        this.requestId = requestId;
+    }
+
+    /**
+     * When an object implementing interface <code>Runnable</code> is used
+     * to create a thread, starting the thread causes the object's
+     * <code>run</code> method to be called in that separately executing
+     * thread.
+     * <p>
+     * The general contract of the method <code>run</code> is that it may
+     * take any action whatsoever.
+     *
+     * @see Thread#run()
+     */
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(new Random().nextInt(100));
+        } catch (InterruptedException e) {
+
+        }
+        System.out.println(name + " " + times + " " + requestId + " 尝试释放锁");
+        boolean b = RedisTool.releaseDistributedLock(jedis, lockKey, requestId);
+        if (b) {
+            System.out.println(name + " " + times + " " + requestId + " 释放锁" + b);
+        } else {
+            System.err.println(name + " " + times + " " + requestId + " 释放锁" + b);
+        }
     }
 }
