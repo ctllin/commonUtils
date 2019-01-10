@@ -74,9 +74,16 @@ public class FastFdsUtil {
             TrackerServer trackerServer = tracker.getConnection();
             StorageServer storageServer = null;
             StorageClient storageClient = new StorageClient(trackerServer, storageServer);
-            String fileIds[] = storageClient.upload_file(localFilePath, "png", nvp);
-           // logger.info("fileIds.length={}", fileIds.length);
-           // logger.info("组名={}", fileIds[0]);
+            int index = localFilePath.lastIndexOf(".") + 1;
+            String file_ext_name = null;
+            if (index >= 2) {
+                localFilePath.substring(index);
+            } else {
+                file_ext_name = "png";
+            }
+            String fileIds[] = storageClient.upload_file(localFilePath, file_ext_name, nvp);
+            // logger.info("fileIds.length={}", fileIds.length);
+            // logger.info("组名={}", fileIds[0]);
             //logger.info("路径={} ", fileIds[1]);
             return fileIds;
         } catch (FileNotFoundException e) {
@@ -219,7 +226,7 @@ public class FastFdsUtil {
 //        logger.info("downresult={}", fastFdsTest.fileServerDownload("group1", strings[1], "e:\\"+UUID.randomUUID()+"test.png"));
 //        logger.info("delresult={}", fastFdsTest.delete( strings[1]));
 
-        File file = new File("C:\\Users\\hanshow\\Desktop\\pic");
+        File file = new File("C:\\Users\\hanshow\\Documents\\WeChat Files\\ctl0630\\Files\\合成3");
         String[] list = file.list();
         for(String name:list){
             String[] stringss = fastFdsTest.fileLocalUpload(file.getPath()+File.separator+name);
