@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisClusterTest {
     public static void main(String[] args) {
-        String lockKey = "lock";
+        String lockKey = "lock1";
         Config config = new Config();
         config.useClusterServers()
                 .addNodeAddress("redis://192.168.42.29:6379")
@@ -33,18 +33,22 @@ public class RedisClusterTest {
         RedissonClient redissonClient = Redisson.create(config);
 
         for (int i = 0; i < 100000000; i++) {
-            try {
-                String name1 = RedisTool.cluster.get("name1");
-                System.out.println(name1);
-            } catch (Exception e) {
-                System.err.println(e);
-            }
+//            try {
+//                String name1 = RedisTool.cluster.get("name1");
+//                System.out.println(name1);
+//            } catch (Exception e) {
+//                System.err.println(e);
+//            }
             try {
                 RLock lock = redissonClient.getLock(lockKey);
                 lock.lock(3, TimeUnit.SECONDS);
                 System.out.println("lock");
-                lock.unlock();
-                System.out.println("unlock");
+                RLock lock2 = redissonClient.getLock(lockKey);
+                lock2.lock(3, TimeUnit.SECONDS);
+                System.out.println("lock2");
+                System.out.println("lock2"+" "+lock2.getHoldCount());
+               // lock.unlock();
+                //System.out.println("unlock");
             } catch (Exception e) {
                 System.err.println(e);
             }

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedissonUtil {
     static final Logger logger = LoggerFactory.getLogger(RedissonUtil.class);
-    private static String lockKey = "lock";
     private static Config config = new Config();
     private static RedissonClient redissonClient = getRedissonClient();
 
@@ -66,11 +66,11 @@ public class RedissonUtil {
 
 
     public static void main(String[] args) {
-        String lock = "redisson_lock";
+        String lock = "redisson_lock1";
         for (int i = 0; i < 1000; i++) {
            try{
                RLock rLock = getRedissonClient().getLock(lock);
-               RedisThreadRedissonLock tLock = new RedisThreadRedissonLock(rLock);
+               RedisThreadRedissonLock tLock = new RedisThreadRedissonLock(UUID.randomUUID().toString(), rLock);
                Thread lockThread = new Thread(tLock);
                //lockThread.setDaemon(true);
                lockThread.start();
@@ -82,24 +82,32 @@ public class RedissonUtil {
     }
 
     static class RedisThreadRedissonLock implements Runnable {
+        private String uuid;
         private RLock rLock;
 
         public RedisThreadRedissonLock() {
         }
 
-        public RedisThreadRedissonLock(RLock rLock) {
+        public RedisThreadRedissonLock(String uuid, RLock rLock) {
+            this.uuid = uuid;
             this.rLock = rLock;
         }
 
         public void run() {
             try {
-                rLock.lock(new Random().nextInt(1000), TimeUnit.MILLISECONDS);
-                logger.info("lock锁定");
+                rLock.lock(new Random().nextInt(1000), TimeUnit.MILLISECONDS); //设置60秒自动释放锁  （默认是30秒自动过期）
+                logger.info("-----------------lock锁定,uuid={}",uuid);
+            } catch (Exception e) {
+                //logger.error("加锁或解锁失败,uuid={}", uuid);
+                System.err.println("-----------------加锁失败uuid=" + uuid + " " + e);
+            }
+            try {
                 Thread.sleep(new Random().nextInt(1000));
                 rLock.unlock();
-                logger.info("unlock解锁");
+                logger.info("################unlock解锁,uuid={}",uuid);
             } catch (Exception e) {
-                System.err.println(e);
+                //logger.error("加锁或解锁失败,uuid={}", uuid);
+                System.err.println("################解锁失败uuid=" + uuid + " " + e);
             }
         }
     }
