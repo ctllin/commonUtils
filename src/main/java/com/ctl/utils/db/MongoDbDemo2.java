@@ -20,7 +20,7 @@ public class MongoDbDemo2 {
             String password = "liebe";
             MongoCredential.createScramSha1Credential(userName, sourc, password.toCharArray());//三个参数分别为 用户名 数据库名称 密码
             MongoCredential credential = MongoCredential.createScramSha1Credential(userName, sourc, password.toCharArray());
-            List<MongoCredential> credentials = new ArrayList<MongoCredential>();
+            List<MongoCredential> credentials = new ArrayList<>();
             credentials.add(credential);
 
             //通过连接认证获取MongoDB连接
