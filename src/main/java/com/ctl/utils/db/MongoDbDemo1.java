@@ -33,10 +33,10 @@ public class MongoDbDemo1 {
             try {
                // 创建固定集合person capped，大小限制为1024个字节，文档数量限制为2。
                 CreateCollectionOptions createCollectionOptions = new CreateCollectionOptions();
-                createCollectionOptions.capped(false);
+                createCollectionOptions.capped(true);
                 createCollectionOptions.sizeInBytes(1024);
                 createCollectionOptions.maxDocuments(2);
-                mongoDatabase.createCollection("person",createCollectionOptions);
+                //mongoDatabase.createCollection("person",createCollectionOptions);
             } catch (Exception e) {
                 logger.error("创建表名失败",e);
             }
@@ -50,10 +50,11 @@ public class MongoDbDemo1 {
              * 2. 创建文档集合List<Document>
              * 3. 将文档集合插入数据库集合中 mongoCollection.insertMany(List<Document>) 插入单个文档可以用 mongoCollection.insertOne(Document)
              * */
-            Document document = new Document("title", "MongoDB").append("description", "database").append("likes", 100).append("by", "Fly").append("_id",System.currentTimeMillis());
+            Long id = System.currentTimeMillis();
+            Document document = new Document("title", "MongoDB").append("description", "database").append("likes", 100).append("by", "Fly").append("_id",id);
             List<Document> documents = new ArrayList<>();
             documents.add(document);
-            personCollection.insertMany(documents);
+            personCollection.insertMany(documents); // capped=true时 超过CreateCollectionOptions.maxDocuments(2)会插入失败
             logger.info("文档插入成功");
 
             FindIterable<Document> findPersonDocuments = personCollection.find();
@@ -74,13 +75,13 @@ public class MongoDbDemo1 {
             }
             logger.info("----------------------------------------------------------------------------------------------");
 
-            //删除符合条件的第一个文档
+            //删除符合条件的第一个文档 capped=true时 com.mongodb.MongoWriteException: cannot remove from a capped collection: test.person
             DeleteResult deleteResult = personCollection.deleteOne(Filters.eq("likes", 2000));
             logger.info("deleteResult={}", deleteResult.getDeletedCount());
-            //删除所有符合条件的文档
+            //删除所有符合条件的文档 capped=true时 com.mongodb.MongoWriteException: cannot remove from a capped collection: test.person
             DeleteResult deleteManyResult = personCollection.deleteMany(Filters.eq("likes", 2000));
             logger.info("deleteManyResult={}", deleteManyResult.getDeletedCount());
-            FindIterable<Document> getById = personCollection.find().filter(Filters.eq("_id", 1548323029675l));
+            FindIterable<Document> getById = personCollection.find().filter(Filters.eq("_id", id));
             logger.info(getById.iterator().next().toJson());
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
