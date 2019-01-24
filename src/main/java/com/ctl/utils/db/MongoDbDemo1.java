@@ -31,12 +31,12 @@ public class MongoDbDemo1 {
             logger.info("database-name={}",name);
             //创建表名
             try {
-               // 创建固定集合person capped，大小限制为1024个字节，文档数量限制为100。
+               // 创建固定集合person capped，大小限制为1024个字节，文档数量限制为2。
                 CreateCollectionOptions createCollectionOptions = new CreateCollectionOptions();
                 createCollectionOptions.capped(false);
                 createCollectionOptions.sizeInBytes(1024);
-                createCollectionOptions.maxDocuments(5);
-                //mongoDatabase.createCollection("person",createCollectionOptions);
+                createCollectionOptions.maxDocuments(2);
+                mongoDatabase.createCollection("person",createCollectionOptions);
             } catch (Exception e) {
                 logger.error("创建表名失败",e);
             }
@@ -78,8 +78,10 @@ public class MongoDbDemo1 {
             DeleteResult deleteResult = personCollection.deleteOne(Filters.eq("likes", 2000));
             logger.info("deleteResult={}", deleteResult.getDeletedCount());
             //删除所有符合条件的文档
-            DeleteResult deleteManyResult = personCollection.deleteMany(Filters.eq("likes", 200));
+            DeleteResult deleteManyResult = personCollection.deleteMany(Filters.eq("likes", 2000));
             logger.info("deleteManyResult={}", deleteManyResult.getDeletedCount());
+            FindIterable<Document> getById = personCollection.find().filter(Filters.eq("_id", 1548323029675l));
+            logger.info(getById.iterator().next().toJson());
         }catch(Exception e){
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );
         }
