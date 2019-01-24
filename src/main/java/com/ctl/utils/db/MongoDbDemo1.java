@@ -88,3 +88,4 @@ public class MongoDbDemo1 {
         }
     }
 }
+// ./mongo 192.168.42.29:27017
