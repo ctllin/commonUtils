@@ -84,6 +84,13 @@
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
             </resource>
+            <resource> <!-- 排除不想编译文件 -->
+                <directory>src/test/java</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.*</exclude>
+                </excludes>
+            </resource>
         </resources>
         <finalName>commonUtils</finalName>
         <plugins>
