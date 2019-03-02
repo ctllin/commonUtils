@@ -17,6 +17,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-all:5.15.8" level="project" />
     <orderEntry type="library" name="Maven: org.redisson:redisson:3.6.5" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.22.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.22.Final" level="project" />
