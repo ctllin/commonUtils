@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>Title: RedisUtil</p>
@@ -62,7 +59,7 @@ public class RedisUtil {
                 }
             }
             //加入前面三个为master后面三个为从属当关闭前三个后 后三个会自动变master 然后从后三个获取数据
-            cluster = new JedisCluster(nodes,100000,20000,30,ConfigUtils.getType("redis.auth"), config);
+            cluster = new JedisCluster(nodes,100000,20000,30, ConfigUtils.getType("redis.auth"), config);
         } else {
             pool = new JedisPool(config, ConfigUtils.getType("redis.host"), Integer.parseInt(ConfigUtils.getType("redis.port")), 10000, ConfigUtils.getType("redis.auth"));
         }
@@ -72,7 +69,10 @@ public class RedisUtil {
      * 多线程环境同步初始化（保证项目中有且仅有一个连接池）
      */
     private static synchronized void poolInit() {
-        if (null == pool || cluster == null) {
+        if (pool == null && "1".equals(ConfigUtils.getType("redis.type"))) {
+            initializePool();
+        }
+        if (cluster == null && "2".equals(ConfigUtils.getType("redis.type"))) {
             initializePool();
         }
     }
@@ -81,9 +81,12 @@ public class RedisUtil {
      * 构建redis连接池 使用过得redis连接直接调用close方法关闭(使用后必须关闭不可以使用pool.returnResource(redis))
      * @return JedisPool
      */
-    private static JedisPool getPool() {
+    public static JedisPool getPool() {
         try {
-            if (pool == null || cluster == null) {
+            if (pool == null && "1".equals(ConfigUtils.getType("redis.type"))) {
+                poolInit();
+            }
+            if (cluster == null && "2".equals(ConfigUtils.getType("redis.type"))) {
                 poolInit();
             }
             if (pool != null) {
@@ -97,13 +100,33 @@ public class RedisUtil {
     }
 
     /**
+     * 获取cluster
+     * @return
+     */
+    public static JedisCluster getCluster() {
+        try {
+            if (cluster == null && "2".equals(ConfigUtils.getType("redis.type"))) {
+                poolInit();
+            }
+            if (cluster != null) {
+                return cluster;
+            } else {
+                logger.info("获取Redis cluster失败");
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("获取redis cluster失败", e);
+            return null;
+        }
+    }
+    /**
      * 设置字符串 保存时间为制定时长
      * @param key
      * @param value
      * @param expire 保存时长单位秒
      * @return
      */
-    public static boolean setString(String key,String value,int expire) {
+    public static boolean setString(String key, String value, int expire) {
         String redisType = ConfigUtils.getType("redis.type");
         if ("2".equals(redisType)) { //集群
             return setStringCluster(key, value, expire);
@@ -111,7 +134,8 @@ public class RedisUtil {
             return setStringSingle(key, value, expire);
         }
     }
-    public static boolean setStringSingle(String key,String value,int expire) {
+
+    public static boolean setStringSingle(String key, String value, int expire) {
         Jedis redis = null;
         try {
             redis = getPool().getResource();
@@ -127,14 +151,22 @@ public class RedisUtil {
             }
         }
     }
-    public static boolean setStringCluster(String key,String value,int expire) {
+
+    public static boolean setStringCluster(String key, String value, int expire) {
         try {
-            String returnStr = cluster.set(key, value);
-            cluster.expire(key, expire);
-            return "OK".equals(returnStr) ? true : false;
+            String returnStr = getCluster().set(key, value);
+            long result = getCluster().expire(key, expire);
+            return "OK".equals(returnStr) && result >= 1 ? true : false;
         } catch (Exception e) {
             logger.error("设置字符串失败", e);
-            return false;
+            try {
+                String returnStr = getCluster().set(key, value);
+                long result = getCluster().expire(key, expire);
+                return "OK".equals(returnStr) && result >= 1 ? true : false;
+            } catch (Exception e1) {
+                logger.error("第二次设置字符串失败", e);
+                return false;
+            }
         } finally {
 
         }
@@ -172,11 +204,17 @@ public class RedisUtil {
     }
     public static boolean setStringCluster(String key,String value) {
         try {
-            String returnStr = cluster.set(key, value);
+            String returnStr = getCluster().set(key, value);
             return "OK".equals(returnStr) ? true : false;
         } catch (Exception e) {
             logger.error("设置字符串失败失败", e);
-            return false;
+            try {
+                String returnStr = getCluster().set(key, value);
+                return "OK".equals(returnStr) ? true : false;
+            } catch (Exception e1) {
+                logger.error("第二次设置字符串失败失败", e1);
+                return false;
+            }
         } finally {
 
         }
@@ -212,9 +250,14 @@ public class RedisUtil {
     }
     public static long delStringCluster(String key) {
         try {
-            return cluster.expire(key, 0);
+            return getCluster().expire(key, 0);
         } catch (Exception e) {
             logger.error("根据key删除字符串失败", e);
+            try {
+                return getCluster().expire(key, 0);
+            } catch (Exception e1) {
+                logger.error("第二次根据key删除字符串失败", e1);
+            }
             return -1;
         } finally {
 
@@ -251,11 +294,11 @@ public class RedisUtil {
     }
     public static String getStringCluster(String key) {
         try {
-            return cluster.get(key);
+            return getCluster().get(key);
         } catch (Exception e) {
             logger.error("获取字符串失败", e);
             try {
-                return cluster.get(key);
+                return getCluster().get(key);
             } catch (Exception e1) {
                 logger.error("第二次获取字符串失败", e);
                 return null;
@@ -284,7 +327,7 @@ public class RedisUtil {
             redis = getPool().getResource();
             return redis.keys(pattern);
         } catch (Exception e) {
-            logger.error("根据key名称删除数据失败", e);
+            logger.error("根据key名称模糊获取key列表失败", e);
             return null;
         } finally {
             if (redis != null) {
@@ -294,19 +337,83 @@ public class RedisUtil {
     }
     public static Set<String> getKeySetCluster(String pattern) {
         try {
-            return cluster.hkeys(pattern);
+            logger.debug("start getting keys...");
+            TreeSet<String> keys = new TreeSet<>();
+            Map<String, JedisPool> clusterNodes = getCluster().getClusterNodes();
+            for (String node : clusterNodes.keySet()) {
+                logger.debug("getting keys from: {}", node);
+                JedisPool jp = clusterNodes.get(node);
+                Jedis connection = null;
+                try {
+                    connection = jp.getResource();
+                    keys.addAll(connection.keys(pattern));
+                } catch (Exception e) {
+                    logger.error("getting keys error node: {}",node, e);
+                } finally {
+                    logger.debug("Connection closed.");
+                    if (connection != null) {
+                        connection.close();//用完一定要close这个链接！！！
+                    }
+                }
+            }
+            logger.debug("Keys gotten!");
+            return keys;
+            //return cluster.hkeys(pattern);
         } catch (Exception e) {
-            logger.error("根据key名称删除数据失败", e);
+            logger.error("根据key名称模糊获取key列表失败", e);
+            return null;
+        } finally {
+
+        }
+    }
+
+    /**
+     * 设置时长
+     * @param key
+     * @param seconds
+     * @return
+     */
+    public static Long expire(String key , int seconds){
+        String redisType = ConfigUtils.getType("redis.type");
+        if ("2".equals(redisType)) { //集群
+            return expireCluster(key, seconds);
+        } else {
+            return expireSingle(key, seconds);
+        }
+    }
+
+    private static Long expireCluster(String key, int seconds) {
+        try {
+            return getCluster().expire(key, seconds);
+        } catch (Exception e) {
+            logger.error("根据key名称设置expire失败", e);
             try {
-                return cluster.hkeys(pattern);
+                return getCluster().expire(key, seconds);
             } catch (Exception e1) {
-                logger.error("第二次根据key名称删除数据失败", e);
+                logger.error("第二次根据key名称设置expire失败", e);
                 return null;
             }
         } finally {
 
         }
     }
+    private static Long expireSingle(String key, int seconds) {
+        Jedis redis = null;
+        try {
+            redis = getPool().getResource();
+            return redis.expire(key, seconds);
+        } catch (Exception e) {
+            logger.error("根据key名称设置expire失败", e);
+            return -1L;
+        } finally {
+            if (redis != null) {
+                redis.close();
+            }
+        }
+    }
+
+
+
     public static void main(String[] args) {
         Set<String> set = RedisUtil.getKeySet("member*");
         System.out.println(set);
@@ -321,6 +428,7 @@ public class RedisUtil {
                        public void run() {
                            System.out.println(setString(""+j,System.currentTimeMillis()+"", 100));
                            System.out.println(getString(j+""));
+
                        }
                    }
            ).start();
