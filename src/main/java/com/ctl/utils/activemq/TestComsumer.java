@@ -24,6 +24,14 @@ public class TestComsumer {
         new Thread(testConsumer.new ConsumerMq(comsumer)).start();
         new Thread(testConsumer.new ConsumerMq(comsumer)).start();
         new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
+//        new Thread(testConsumer.new ConsumerMq(comsumer)).start();
     }
 
     private class ConsumerMq implements Runnable{
@@ -37,7 +45,7 @@ public class TestComsumer {
             while(true){
                 try {
                     comsumer.getMessage(ActiveMQConfig.QUEUE_NAME);
-                    Thread.sleep(10000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
