@@ -1,5 +1,8 @@
 package com.ctl.utils.activemq;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * <p>Title: Test</p>
  * <p>Description: </p>
@@ -11,6 +14,8 @@ package com.ctl.utils.activemq;
  * @date 2019-03-02 18:40
  */
 public class TestMq {
+    static Logger logger = LoggerFactory.getLogger(TestMq.class);
+
     public static void main(String[] args){
         Producter producter = new Producter();
         producter.init();
@@ -42,7 +47,7 @@ public class TestMq {
         public void run() {
             while(true){
                 try {
-                    producter.sendMessage("Jaycekon-MQ");
+                    producter.sendMessage(ActiveMQConfig.QUEUE_NAME);
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

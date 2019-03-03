@@ -2,6 +2,9 @@ package com.ctl.utils.activemq;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jms.*;
 import java.util.concurrent.atomic.AtomicInteger;
 /**
@@ -15,12 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019-03-02 18:40
  */
 public class Comsumer {
+    static Logger logger = LoggerFactory.getLogger(Comsumer.class);
 
-    private static final String USERNAME = ActiveMQConnection.DEFAULT_USER;
+    private static final String USERNAME =ActiveMQConfig.USERNAME;// ActiveMQConnection.DEFAULT_USER;
 
-    private static final String PASSWORD = ActiveMQConnection.DEFAULT_PASSWORD;
+    private static final String PASSWORD = ActiveMQConfig.PASSWORD;// ActiveMQConnection.DEFAULT_PASSWORD;
 
-    private static final String BROKEN_URL = ActiveMQConnection.DEFAULT_BROKER_URL;
+    private static final String BROKEN_URL = ActiveMQConfig.BROKEN_URL;// ActiveMQConnection.DEFAULT_BROKER_URL;
 
     ConnectionFactory connectionFactory;
 
@@ -38,7 +42,7 @@ public class Comsumer {
             connection.start();
             session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException e) {
-            e.printStackTrace();
+           logger.error("init fail",e);
         }
     }
 
@@ -65,9 +69,11 @@ public class Comsumer {
                 }
             }
         } catch (JMSException e) {
-            e.printStackTrace();
+            logger.error("JMSException",e);
+
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("InterruptedException",e);
+
         }
     }
 }

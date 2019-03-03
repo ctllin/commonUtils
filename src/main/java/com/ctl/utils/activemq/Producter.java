@@ -2,6 +2,9 @@ package com.ctl.utils.activemq;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.jms.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,13 +19,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019-03-02 18:37
  */
 public class Producter {
+    static Logger logger = LoggerFactory.getLogger(Producter.class);
 
     //ActiveMq 的默认用户名
-    private static final String USERNAME = ActiveMQConnection.DEFAULT_USER;
+    private static final String USERNAME = ActiveMQConfig.USERNAME;//ActiveMQConnection.DEFAULT_USER;
     //ActiveMq 的默认登录密码
-    private static final String PASSWORD = ActiveMQConnection.DEFAULT_PASSWORD;
+    private static final String PASSWORD = ActiveMQConfig.PASSWORD;//ActiveMQConnection.DEFAULT_PASSWORD;
     //ActiveMQ 的链接地址
-    private static final String BROKEN_URL = ActiveMQConnection.DEFAULT_BROKER_URL;
+    private static final String BROKEN_URL = ActiveMQConfig.BROKEN_URL;//ActiveMQConnection.DEFAULT_BROKER_URL;
 
     AtomicInteger count = new AtomicInteger(0);
     //链接工厂
@@ -42,6 +46,13 @@ public class Producter {
             //开启链接
             connection.start();
             //创建一个事务（这里通过参数可以设置事务的级别）
+            /*4.获取session  (参数1：是否启动事务,
+             参数2：消息确认模式[
+             AUTO_ACKNOWLEDGE = 1    自动确认
+             CLIENT_ACKNOWLEDGE = 2    客户端手动确认
+             DUPS_OK_ACKNOWLEDGE = 3    自动批量确认
+             SESSION_TRANSACTED = 0    事务提交并确认
+            ])*/
             session = connection.createSession(true,Session.SESSION_TRANSACTED);
         } catch (JMSException e) {
             e.printStackTrace();

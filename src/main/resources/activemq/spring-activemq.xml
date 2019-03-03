@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-4.0.xsd
+        http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.14.5.xsd
+        ">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.ctl.utils.activemq"/>
+
+    <!-- 读取配置文件 -->
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <array>
+                <value>classpath:activemq/spring-activemq-config.properties</value>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 连接 activemq-->
+    <amq:connectionFactory id="amqConnectionFactory" brokerURL="${activemq_url}" userName="${activemq_username}" password="${activemq_password}"/>
+
+    <!-- 这里可以采用连接池的方式连接PooledConnectionFactoryBean -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <!-- 配置连接 -->
+        <property name="targetConnectionFactory" ref="amqConnectionFactory"/>
+        <!-- 会话的最大连接数 -->
+        <property name="sessionCacheSize" value="100"/>
+    </bean>
+
+    <!-- 定义消息队列topic类型，queue的方式差不多 -->
+    <bean id="topic" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 定义名称 -->
+        <constructor-arg index="0" value="topic"/>
+    </bean>
+
+    <!-- 配置JMS模板（topic），Spring提供的JMS工具类，它发送、接收消息。 -->
+    <!-- 为了测试发送消息，保留jmsTemplate的配置，实际不存在发送，只需要配置监听即可 -->
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="topic"/>
+        <!-- 非pub/sub模型（发布/订阅），true为topic,false为queue -->
+        <property name="pubSubDomain" value="true"/>
+    </bean>
+
+    <!-- 监听方式，这种方式更实用，可以一直监听消息 -->
+    <bean id="topicMessageListen" class="com.ctl.utils.activemq.TopicMessageListen"/>
+    <bean id="defaultMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <!-- 注册activemq名称 -->
+        <property name="destination" ref="topic"/>
+        <property name="messageListener" ref="topicMessageListen"/>
+    </bean>
+
+</beans>
