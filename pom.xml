@@ -183,6 +183,24 @@
                     </execution>
                 </executions>
             </plugin>
+         <!--
+         将依赖打入一个包中
+         <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.ctl.utils.io.NIOServerUtil</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+-->
         </plugins>
     </build>
 
